@@ -19,11 +19,13 @@ def next_batch(x, y, batch_size=BATCH_SIZE):
         i = i + batch_size
 
 if __name__ == '__main__':
+    sess = tf.InteractiveSession()
+
     network = model.GAN()
     images, labels = load_data.load_SVHN()
     
     label_ = tf.placeholder(tf.float32, [None, 2])
-    sess = tf.Session()
+    # sess = tf.Session()
     sess.run(tf.global_variables_initializer())
     
     train_step = tf.train.AdamOptimizer(1e-4).minimize(network.dis.loss(logit=network.dis.h_fc8, label=label_))
