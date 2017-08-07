@@ -41,6 +41,6 @@ if __name__ == '__main__':
         sess.run(train_step, feed_dict={network.gen.raw_input_image:model.init_weight_variable([BATCH_SIZE, 32 * 32 * 3]),\
                                         network.dis.raw_input_images:network.gen.h_fc6, label_:y})
         if step % 500 == 0:
-            xn = network.gen.generate(sess, 100)
+            data = network.gen.generate(sess, 100)
             load_data.cv2_save(n=10, m=10, data, file_path="{}.png".format(step))
     
