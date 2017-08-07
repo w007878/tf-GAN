@@ -26,8 +26,8 @@ if __name__ == '__main__':
     label_ = tf.placeholder(tf.float32, [None, 2])
     # sess = tf.Session()
     
-    train_step = tf.train.AdamOptimizer(1e-4).minimize(gan.dis.loss(logit=gan.dis.h_fc8, label=label_))
-    correct_prediction = tf.equal(tf.argmax(label_, 1), tf.argmax(gan.dis.h_fc8, 1))
+    train_step = tf.train.AdamOptimizer(1e-4).minimize(gan.gan.loss(logit=gan.gan.h_fc8, label=label_))
+    correct_prediction = tf.equal(tf.argmax(label_, 1), tf.argmax(gan.gan.h_fc8, 1))
     
     sess = tf.InteractiveSession()
     sess.run(tf.global_variables_initializer())
@@ -36,7 +36,7 @@ if __name__ == '__main__':
         if step % 10 == 0:
             print("Epoch %d" % step)
             
-        gan.dis.set_trainable(True)
+        gan.gan.set_trainable(True)
         batch_step = 0
         for x, _ in next_batch(images, labels):
                 
@@ -60,7 +60,7 @@ if __name__ == '__main__':
             gan.gen.set_trainable(False)
             
             # print data.shape, label.shape
-            sess.run(train_step, feed_dict={gan.dis.raw_input_image:data, label_:label, \
+            sess.run(train_step, feed_dict={gan.gan.raw_input_image:data, label_:label, \
                                             gan.gen.raw_input_image:np.zeros([2 * len(x), 32 * 32 * 3]),})
 
             if batch_step % 100 == 0:
@@ -68,11 +68,11 @@ if __name__ == '__main__':
                 print("Epoch %d, Batch: %d" % (step, batch_step))
                 input_noise = init_random([BATCH_SIZE, 32 * 32 * 3])
                 gan.gen.set_trainable(True)
-                gan.dis.set_trainable(False)
+                gan.gan.set_trainable(False)
                 y = np.array([[1, 0]] * BATCH_SIZE)
                 
                 sess.run(train_step, feed_dict={gan.gen.raw_input_image:input_noise, \
-                                                gan.dis.raw_input_image:np.zeros([BATCH_SIZE, 32 * 32 * 3]), \
+                                                gan.gan.raw_input_image:np.zeros([BATCH_SIZE, 32 * 32 * 3]), \
                                                 label_:y})
                 # gan.transform(True)
                 gan.symbol = 0
