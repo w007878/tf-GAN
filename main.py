@@ -7,7 +7,7 @@ import model
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 BATCH_SIZE = 50
-EPOCH_SIZE = 10000
+EPOCH_SIZE = 1000
 
 def init_random(shape):
     return np.random.random_sample(shape)
@@ -77,7 +77,7 @@ if __name__ == '__main__':
                 # gan.transform(True)
                 gan.symbol = 0
                 
-        if step % 500 == 0:
+        if step % 20 == 0:
             data = gan.gen.generate(sess, init_random([100, 32 * 32 * 3]))
             load_data.cv2_save(n=10, m=10, data=data, file_path="gen/{}.png".format(step))
     
