@@ -37,9 +37,14 @@ if __name__ == '__main__':
             print("Epoch %d" % step)
             
         network.dis.set_trainable(True)
+        batch_step = 0
         for x, _ in next_batch(images, labels):
 
-            x_ = x.reshape(BATCH_SIZE, 32 * 32 * 3)
+            if batch_step % 20 == 0:
+                print("Batch: %d", batch_step)
+            batch_step = batch_step + 1
+            
+            x_ = x.reshape(len(x), 32 * 32 * 3)
             y = np.array([[1, 0]] * len(x))
 
             input_noise = init_random([len(x), 32 * 32 * 3])
