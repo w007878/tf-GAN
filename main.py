@@ -74,6 +74,7 @@ if __name__ == '__main__':
                 sess.run(train_step, feed_dict={gan.gen.raw_input_image:input_noise, \
                                                 gan.gan.raw_input_image:np.zeros([BATCH_SIZE, 32 * 32 * 3]), \
                                                 label_:y})
+                gan.gan.set_trainable(True)
                 # gan.transform(True)
                 gan.symbol = 0
                 
