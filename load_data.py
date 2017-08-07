@@ -3,7 +3,7 @@ import tensorflow as tf
 import numpy as np
 import scipy.io
 import cv2
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 SVHN_DIR = 'data/SVHN/train_32x32.mat'
 
@@ -20,16 +20,16 @@ def load_SVHN():
         
     return data, ans
 
-    
-def visual_data(n, m, data, label):
-    for i in range(n * m):
-        print(i)
-        plt.subplot(n, m, i + 1)
-        plt.title(np.argmax(label[i]))
-        plt.imshow(data[i])
-        plt.axis('off')
-    print type(data)
-    plt.show()
+#     
+# def visual_data(n, m, data, label):
+#     for i in range(n * m):
+#         print(i)
+#         plt.subplot(n, m, i + 1)
+#         plt.title(np.argmax(label[i]))
+#         plt.imshow(data[i])
+#         plt.axis('off')
+#     print type(data)
+#     plt.show()
     
 def cv2_save(n, m, data, file_path=None):
     data = data.reshape((n, m, 32, 32, 3))
@@ -43,11 +43,11 @@ def cv2_save(n, m, data, file_path=None):
     
     # print(image)
     if file_path == None:
-        image = image / 256.
+        image = image
         cv2.imshow('image', image)
         cv2.waitKey(0)
     else:
-        cv2.imwrite(file_path, image)
+        cv2.imwrite((file_path * 256).astype(np.int), image)
     
 def test():
     data, label = load_SVHN()
