@@ -19,17 +19,18 @@ def next_batch(x, y, batch_size=BATCH_SIZE):
         i = i + batch_size
 
 if __name__ == '__main__':
-    sess = tf.InteractiveSession()
 
     network = model.GAN()
     images, labels = load_data.load_SVHN()
     
     label_ = tf.placeholder(tf.float32, [None, 2])
     # sess = tf.Session()
-    sess.run(tf.global_variables_initializer())
     
     train_step = tf.train.AdamOptimizer(1e-4).minimize(network.dis.loss(logit=network.dis.h_fc8, label=label_))
     correct_prediction = tf.equal(tf.argmax(label_, 1), tf.argmax(network.dis.h_fc8, 1))
+    
+    sess = tf.InteractiveSession()
+    sess.run(tf.global_variables_initializer())
     
     for step in range(EPOCH_SIZE):
         if step % 10 == 0:
