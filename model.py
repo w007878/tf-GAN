@@ -1,4 +1,4 @@
-import os
+ import os
 import numpy as np
 import tensorflow as tf
 import cv2
@@ -22,7 +22,7 @@ class Discriminator:
         self.symbol = 0
         self.gen = gen
         self.raw_input_image = tf.placeholder(tf.float32, [None, 32 * 32 * 3])
-        self.input_image = tf.reshape(self.raw_input_image, [-1, 32, 32, 3]) + self.gen.h_fc6 * self.symbol
+        self.input_image = tf.reshape(self.raw_input_image + self.gen.h_fc6 * self.symbol, [-1, 32, 32, 3])
 
         self.W_conv1 = init_weight_variable([3, 3, 3, 32])
         self.b_conv1 = init_bias_variable([32])
