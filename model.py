@@ -119,5 +119,11 @@ class GAN:
     def __init__(self):
         self.dis = Discriminator()
         self.gen = Generator()
+        
+    def transform(self, direction):
+        if direction == True:
+            dis.raw_input_image = tf.placeholder(tf.float32, [None, 32 * 32 * 3])
+        else:
+            dis.raw_input_image = gen.h_fc6
     
     

@@ -39,9 +39,7 @@ if __name__ == '__main__':
         network.dis.set_trainable(True)
         batch_step = 0
         for x, _ in next_batch(images, labels):
-
-            if batch_step % 100 == 0:
-                print("Epoch %d, Batch: %d" % (step, batch_step))
+                
             batch_step = batch_step + 1
             
             x_ = x.reshape(len(x), 32 * 32 * 3)
@@ -63,12 +61,15 @@ if __name__ == '__main__':
             # print data.shape, label.shape
             sess.run(train_step, feed_dict={network.dis.raw_input_image:data, label_:label})
 
-        input_noise = init_random([BATCH_SIZE, 32 * 32 * 3])
-        network.dis.set_trainable(False)
-        y = np.array([[1, 0]] * BATCH_SIZE)
-        sess.run(train_step, feed_dict={network.gen.raw_input_image:input_noise,\
-                                        network.dis.raw_input_image:(network.gen.h_fc6 / np.max(network.gen.h_fc6)),\
-                                        label_:y})
+            if batch_step % 100 == 0:
+                network.transform(False)
+                print("Epoch %d, Batch: %d" % (step, batch_step))
+                input_noise = init_random([BATCH_SIZE, 32 * 32 * 3])
+                network.dis.set_trainable(False)
+                y = np.array([[1, 0]] * BATCH_SIZE)
+                
+                sess.run(train_step, feed_dict={network.gen.raw_input_image:input_noise, label_:y})
+                network.transform(True)
         if step % 500 == 0:
             data = network.gen.generate(sess, init_random([100, 32 * 32 * 3]))
             load_data.cv2_save(n=10, m=10, data=data, file_path="gen/{}.png".format(step))
