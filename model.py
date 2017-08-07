@@ -55,8 +55,8 @@ class Discriminator:
         self.h_fc7 = tf.nn.relu(tf.matmul(self.h_fc6_drop, self.W_fc7) + self.b_fc7)
         self.h_fc7_drop = tf.nn.dropout(self.h_fc7, keep_rate)
         
-        self.W_fc8 = init_weight_variable([1024, 10])
-        self.b_fc8 = init_bias_variable([10])
+        self.W_fc8 = init_weight_variable([1024, 1])
+        self.b_fc8 = init_bias_variable([1])
         self.h_fc8 = tf.nn.relu(tf.matmul(self.h_fc7_drop, self.W_fc8) + self.b_fc8)
     
     def set_trainable(able):
