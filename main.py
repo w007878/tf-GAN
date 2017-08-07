@@ -40,8 +40,8 @@ if __name__ == '__main__':
         batch_step = 0
         for x, _ in next_batch(images, labels):
 
-            if batch_step % 20 == 0:
-                print("Batch: %d", batch_step)
+            if batch_step % 100 == 0:
+                print("Batch: %d" % batch_step)
             batch_step = batch_step + 1
             
             x_ = x.reshape(len(x), 32 * 32 * 3)
@@ -67,7 +67,7 @@ if __name__ == '__main__':
         network.dis.set_trainable(False)
         y = np.array([[1, 0]] * BATCH_SIZE)
         sess.run(train_step, feed_dict={network.gen.raw_input_image:input_noise,\
-                                        network.dis.raw_input_images:(network.gen.h_fc6 / np.max(network.gen.h_fc6)),\
+                                        network.dis.raw_input_image:(network.gen.h_fc6 / np.max(network.gen.h_fc6)),\
                                         label_:y})
         if step % 500 == 0:
             data = network.gen.generate(sess, init_random([100, 32 * 32 * 3]))
