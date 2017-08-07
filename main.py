@@ -20,14 +20,14 @@ def next_batch(x, y, batch_size=BATCH_SIZE):
 
 if __name__ == '__main__':
 
-    network = model.GAN()
+    gan = model.GAN()
     images, labels = load_data.load_SVHN()
     
     label_ = tf.placeholder(tf.float32, [None, 2])
     # sess = tf.Session()
     
-    train_step = tf.train.AdamOptimizer(1e-4).minimize(network.dis.loss(logit=network.dis.h_fc8, label=label_))
-    correct_prediction = tf.equal(tf.argmax(label_, 1), tf.argmax(network.dis.h_fc8, 1))
+    train_step = tf.train.AdamOptimizer(1e-4).minimize(network.dis.loss(logit=gan.dis.h_fc8, label=label_))
+    correct_prediction = tf.equal(tf.argmax(label_, 1), tf.argmax(gan.dis.h_fc8, 1))
     
     sess = tf.InteractiveSession()
     sess.run(tf.global_variables_initializer())
@@ -46,7 +46,7 @@ if __name__ == '__main__':
             y = np.array([[1, 0]] * len(x))
 
             input_noise = init_random([len(x), 32 * 32 * 3])
-            xn = network.gen.generate(sess, input_noise=input_noise)
+            xn = gan.gen.generate(sess, input_noise=input_noise)
             yn = np.array([[0, 1]] * len(x))
 
             x_ = x_.astype(np.float32)
@@ -57,19 +57,26 @@ if __name__ == '__main__':
             # print yn.shape, y.shape
             data = np.concatenate((x_, xn))
             label = np.concatenate((y, yn))
+            gan.gen.set_trainable(False)
             
             # print data.shape, label.shape
-            sess.run(train_step, feed_dict={network.dis.raw_input_image:data, label_:label})
+            sess.run(train_step, feed_dict={network.dis.raw_input_image:data, label_:label, \
+                                            gan.gen.raw_input_image:np.zeros([2 * len(x), 32 * 32 * 3]),})
 
             if batch_step % 100 == 0:
-                network.transform(False)
+                gan.symbol = 1
                 print("Epoch %d, Batch: %d" % (step, batch_step))
                 input_noise = init_random([BATCH_SIZE, 32 * 32 * 3])
+                gan.gen.set_trainable(True)
                 network.dis.set_trainable(False)
                 y = np.array([[1, 0]] * BATCH_SIZE)
                 
-                sess.run(train_step, feed_dict={network.gen.raw_input_image:input_noise, label_:y})
+                sess.run(train_step, feed_dict={gan.gen.raw_input_image:input_noise, \
+                                                gan.dis.raw_input_image:np.zeros([BATCH_SIZE, 32 * 32 * 3]), \
+                                                label_:y})
                 network.transform(True)
+                gan.symbol = 0
+                
         if step % 500 == 0:
             data = network.gen.generate(sess, init_random([100, 32 * 32 * 3]))
             load_data.cv2_save(n=10, m=10, data=data, file_path="gen/{}.png".format(step))

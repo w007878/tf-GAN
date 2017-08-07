@@ -18,9 +18,11 @@ def max_pool_2x2(x):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
 class Discriminator:
-    def __init__(self, keep_rate=1.0):
+    def __init__(self, gen, keep_rate=1.0):
+        self.symbol = 0
+        self.gen = gen
         self.raw_input_image = tf.placeholder(tf.float32, [None, 32 * 32 * 3])
-        self.input_image = tf.reshape(self.raw_input_image, [-1, 32, 32, 3])
+        self.input_image = tf.reshape(self.raw_input_image, [-1, 32, 32, 3]) + self.gen.h_fc6 * self.symbol
 
         self.W_conv1 = init_weight_variable([3, 3, 3, 32])
         self.b_conv1 = init_bias_variable([32])
@@ -114,16 +116,13 @@ class Generator:
         # print self.h_fc
         # print image
         return image
+    
+    def set_trainable(able):
+        self.W_conv1.trainable, self.b_conv1.trainable, self.W_conv2.trainable, self.b_conv2.trainable, \
+        self.W_conv3.trainable, self.b_conv3.trainable, self.W_conv4.trainable, self.b_conv4.trainable, \
+        self.W_fc5.trainable, self.b_fc5.trainable, self.W_fc6.trainable, self.b_fc6.trainable = [able] * 12
         
 class GAN:
     def __init__(self):
-        self.dis = Discriminator()
         self.gen = Generator()
-        
-    def transform(self, direction):
-        if direction == True:
-            self.dis.raw_input_image = tf.placeholder(tf.float32, [None, 32 * 32 * 3])
-        else:
-            self.dis.raw_input_image = self.gen.h_fc6
-    
-    
+        self.gan = Discriminator(self.gen)
