@@ -71,5 +71,5 @@ if __name__ == '__main__':
                                         label_:y})
         if step % 500 == 0:
             data = network.gen.generate(sess, init_random([100, 32 * 32 * 3]))
-            load_data.cv2_save(n=10, m=10, data=data, file_path="{}.png".format(step))
+            load_data.cv2_save(n=10, m=10, data=data, file_path="gen/{}.png".format(step))
     
