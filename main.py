@@ -5,6 +5,7 @@ import cv2
 import load_data
 import model
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 BATCH_SIZE = 50
 EPOCH_SIZE = 10000
 
