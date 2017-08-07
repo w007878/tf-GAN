@@ -18,11 +18,11 @@ def max_pool_2x2(x):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
 class Discriminator:
-    def __intt__():
+    def __init__(self, keep_rate=1.0):
         self.raw_input_image = tf.placeholder(tf.float32, [None, 32 * 32 * 3])
         self.input_image = tf.reshape(self.raw_input_image, [-1, 32, 32, 3])
 
-        self.W_conv1 = init_weight_variable([3, 3, 1, 32])
+        self.W_conv1 = init_weight_variable([3, 3, 3, 32])
         self.b_conv1 = init_bias_variable([32])
         self.h_conv1 = tf.nn.relu(conv2d(self.input_image, self.W_conv1) + self.b_conv1) 
         self.h_pool1 = max_pool_2x2(self.h_conv1)
@@ -43,9 +43,9 @@ class Discriminator:
         self.W_conv5 = init_weight_variable([3, 3, 64, 128])
         self.b_conv5 = init_bias_variable([128])
         self.h_conv5 = tf.nn.relu(conv2d(self.h_conv4, self.W_conv5) + self.b_conv5) 
-        self.h_conv5_flat = tf.reshape(self.h_conv5, [-1, 7 * 7 * 128])
+        self.h_conv5_flat = tf.reshape(self.h_conv5, [-1, 8 * 8 * 128])
 
-        self.W_fc6 = init_weight_variable([7 * 7 * 128, 512])
+        self.W_fc6 = init_weight_variable([8 * 8 * 128, 512])
         self.b_fc6 = init_bias_variable([512])
         self.h_fc6 = tf.nn.relu(tf.matmul(self.h_conv5_flat, self.W_fc6) + self.b_fc6)
         self.h_fc6_drop = tf.nn.dropout(self.h_fc6, keep_rate)
@@ -55,25 +55,25 @@ class Discriminator:
         self.h_fc7 = tf.nn.relu(tf.matmul(self.h_fc6_drop, self.W_fc7) + self.b_fc7)
         self.h_fc7_drop = tf.nn.dropout(self.h_fc7, keep_rate)
         
-        self.W_fc8 = init_weight_variable([1024, 1])
-        self.b_fc8 = init_bias_variable([1])
+        self.W_fc8 = init_weight_variable([1024, 2])
+        self.b_fc8 = init_bias_variable([2])
         self.h_fc8 = tf.nn.relu(tf.matmul(self.h_fc7_drop, self.W_fc8) + self.b_fc8)
     
-    def set_trainable(able):
-        W_conv1.trainable, b_conv1.trainable, W_conv2.trainable, b_conv2.trainable, \
-        W_conv3.trainable, b_conv3.trainable, W_conv4.trainable, b_conv4.trainable, \
-        W_conv5.trainable, b_conv5.trainable, W_fc6.trainable, b_fc6.trainable, \
-        W_fc7.trainable, b_fc7.trainable, W_fc8.trainable, b_fc8.trainable = able
+    def set_trainable(self, able):
+        self.W_conv1.trainable, self.b_conv1.trainable, self.W_conv2.trainable, self.b_conv2.trainable, \
+        self.W_conv3.trainable, self.b_conv3.trainable, self.W_conv4.trainable, self.b_conv4.trainable, \
+        self.W_conv5.trainable, self.b_conv5.trainable, self.W_fc6.trainable, self.b_fc6.trainable, \
+        self.W_fc7.trainable, self.b_fc7.trainable, self.W_fc8.trainable, self.b_fc8.trainable = [able] * 16
     
     def loss(self, label, logit):
         return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label, logits=logit))
 
 class Generator:
-    def __init__():
+    def __init__(self, keep_rate=1.0):
         self.raw_input_image = tf.placeholder(tf.float32, [None, 32 * 32 * 3])
         self.input_image = tf.reshape(self.raw_input_image, [-1, 32, 32, 3])
 
-        self.W_conv1 = init_weight_variable([3, 3, 1, 32])
+        self.W_conv1 = init_weight_variable([3, 3, 3, 32])
         self.b_conv1 = init_bias_variable([32])
         self.h_conv1 = tf.nn.relu(conv2d(self.input_image, self.W_conv1) + self.b_conv1) 
         self.h_pool1 = max_pool_2x2(self.h_conv1)
@@ -90,9 +90,9 @@ class Generator:
         self.W_conv4 = init_weight_variable([3, 3, 64, 128])
         self.b_conv4 = init_bias_variable([128])
         self.h_conv4 = tf.nn.relu(conv2d(self.h_pool3, self.W_conv4) + self.b_conv4) 
-        self.h_conv4_flat = tf.reshape(self.h_conv4, [-1, 7 * 7 * 128])
+        self.h_conv4_flat = tf.reshape(self.h_conv4, [-1, 8 * 8 * 128])
 
-        self.W_fc5 = init_weight_variable([7 * 7 *128, 258])
+        self.W_fc5 = init_weight_variable([8 * 8 * 128, 256])
         self.b_fc5 = init_bias_variable([256])
         self.h_fc5 = tf.nn.relu(tf.matmul(self.h_conv4_flat, self.W_fc5) + self.b_fc5)
         self.h_fc5_drop = tf.nn.dropout(self.h_fc5, keep_rate)
@@ -100,15 +100,24 @@ class Generator:
         self.W_fc6 = init_weight_variable([256, 32 * 32 * 3])
         self.b_fc6 = init_bias_variable([32 * 32 * 3])
         self.h_fc6 = tf.nn.relu(tf.matmul(self.h_fc5_drop, self.W_fc6) + self.b_fc6)
+        
+        # print(np.max(self.h_fc6))
+        # self.h_fc6 = self.h_fc6 / np.max(self.h_fc6)
 
-    def generate(sess, batch_size):
-        input_noise = init_weight_variable([batch_size, 32 * 32 * 3]):
-        image = sess.run(self.h_fc6, feed_dict={self.raw_input_image:imput_noise})
+    def generate(self, sess, input_noise):
+        # input_noise = init_weight_variable([batch_size, 32 * 32 * 3])
+        # print input_noise
+        # print self.raw_input_image
+        image = sess.run(self.h_fc6, feed_dict={self.raw_input_image:input_noise})
+        # image = self.h_fc6.eval(feed_dict={self.raw_input_image:input_noise}, session=sess)
+        # image = tf.run(sess, self.h_fc6, feed_dict={self.raw_input_image:input_noise})
+        # print self.h_fc
+        # print image
         return image
         
 class GAN:
-    def __init__:
-        dis = Discriminator();
-        gen = Generator();
+    def __init__(self):
+        self.dis = Discriminator()
+        self.gen = Generator()
     
     

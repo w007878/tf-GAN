@@ -3,12 +3,15 @@ import tensorflow as tf
 import numpy as np
 import cv2
 import load_data
-import model
+import model 
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 BATCH_SIZE = 50
 EPOCH_SIZE = 10000
 
+def init_random(shape):
+    return np.random.random_sample(shape)
+    
 def next_batch(x, y, batch_size=BATCH_SIZE):
     i = 0
     while(i < len(x)):
@@ -19,28 +22,46 @@ if __name__ == '__main__':
     network = model.GAN()
     images, labels = load_data.load_SVHN()
     
-    label_ = tf.placeholder(tf.float32, [None, 10])
+    label_ = tf.placeholder(tf.float32, [None, 2])
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
     
-    train_step = tf.train.AdamOptimizer(1e-4).minimize(network.dis.loss(labels=network.dis.h_fc8, logits=label_))
-    correct_prediction = tf.equal(tf.argmax(label_, 1), tf.argmax(sim_network.h_fc8, 1))
+    train_step = tf.train.AdamOptimizer(1e-4).minimize(network.dis.loss(logit=network.dis.h_fc8, label=label_))
+    correct_prediction = tf.equal(tf.argmax(label_, 1), tf.argmax(network.dis.h_fc8, 1))
     
     for step in range(EPOCH_SIZE):
+        if step % 10 == 0:
+            print("Epoch %d" % step)
+            
         network.dis.set_trainable(True)
         for x, _ in next_batch(images, labels):
-            y = np.ones(len(x))
-            xn = network.gen.generate(sess, len(x))
-            yn = np.zeros(len(s))
-            data = np.concat(x, xn)
-            label = np.concat(y, yn)
-            sess.run(train_step, feep_dict={network.dis.raw_input_image:data.reshape([BATCH_SIZE, 32 * 32 * 3]),\
-                                            label_:label})
+
+            x_ = x.reshape(BATCH_SIZE, 32 * 32 * 3)
+            y = np.array([[1, 0]] * len(x))
+
+            input_noise = init_random([len(x), 32 * 32 * 3])
+            xn = network.gen.generate(sess, input_noise=input_noise)
+            yn = np.array([[0, 1]] * len(x))
+
+            x_ = x_.astype(np.float32)
+            x_ = x_ / np.max(x_)
+            xn = xn / np.max(xn)
+            
+            # print xn.shape, x_.shape
+            # print yn.shape, y.shape
+            data = np.concatenate((x_, xn))
+            label = np.concatenate((y, yn))
+            
+            # print data.shape, label.shape
+            sess.run(train_step, feed_dict={network.dis.raw_input_image:data, label_:label})
+
+        input_noise = init_random([len(x), 32 * 32 * 3])
         network.dis.set_trainable(False)
-        y = np.ones(BATCH_SIZE)
-        sess.run(train_step, feed_dict={network.gen.raw_input_image:model.init_weight_variable([BATCH_SIZE, 32 * 32 * 3]),\
-                                        network.dis.raw_input_images:network.gen.h_fc6, label_:y})
+        y = np.array([[1, 0]] * BATCH_SIZE)
+        sess.run(train_step, feed_dict={network.gen.raw_input_image:input_noise,\
+                                        network.dis.raw_input_images:(network.gen.h_fc6 / np.max(network.gen.h_fc6)),\
+                                        label_:y})
         if step % 500 == 0:
-            data = network.gen.generate(sess, 100)
-            load_data.cv2_save(n=10, m=10, data, file_path="{}.png".format(step))
+            data = network.gen.generate(sess, init_random([100, 32 * 32 * 3]))
+            load_data.cv2_save(n=10, m=10, data=data, file_path="{}.png".format(step))
     
