@@ -122,8 +122,8 @@ class GAN:
         
     def transform(self, direction):
         if direction == True:
-            dis.raw_input_image = tf.placeholder(tf.float32, [None, 32 * 32 * 3])
+            self.dis.raw_input_image = tf.placeholder(tf.float32, [None, 32 * 32 * 3])
         else:
-            dis.raw_input_image = gen.h_fc6
+            self.dis.raw_input_image = self.gen.h_fc6
     
     
