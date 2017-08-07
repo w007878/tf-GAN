@@ -47,7 +47,7 @@ def cv2_save(n, m, data, file_path=None):
         cv2.imshow('image', image)
         cv2.waitKey(0)
     else:
-        cv2.imwrite((file_path * 256).astype(np.int), image)
+        cv2.imwrite(file_path, (image * 256).astype(np.int))
     
 def test():
     data, label = load_SVHN()
