@@ -5,7 +5,7 @@ import cv2
 import load_data
 import model
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 BATCH_SIZE = 50
 EPOCH_SIZE = 10000
 
@@ -42,5 +42,5 @@ if __name__ == '__main__':
                                         network.dis.raw_input_images:network.gen.h_fc6, label_:y})
         if step % 500 == 0:
             xn = network.gen.generate(sess, 100)
-            load_data.cv2_save(n=10, m=10, data, file_path="{}.png" % step)
+            load_data.cv2_save(n=10, m=10, data, file_path="{}.png".format(step))
     
