@@ -117,7 +117,7 @@ class Generator:
         # print image
         return image
     
-    def set_trainable(able):
+    def set_trainable(self, able):
         self.W_conv1.trainable, self.b_conv1.trainable, self.W_conv2.trainable, self.b_conv2.trainable, \
         self.W_conv3.trainable, self.b_conv3.trainable, self.W_conv4.trainable, self.b_conv4.trainable, \
         self.W_fc5.trainable, self.b_fc5.trainable, self.W_fc6.trainable, self.b_fc6.trainable = [able] * 12
