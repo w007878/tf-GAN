@@ -6,7 +6,7 @@ import load_data
 import model_v2 as model
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "2"
-BATCH_SIZE = 50
+BATCH_SIZE = 100
 EPOCH_SIZE = 1000
 
 def init_random(shape):
