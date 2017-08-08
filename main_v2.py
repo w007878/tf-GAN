@@ -48,7 +48,7 @@ if __name__ == '__main__':
             y = np.array([[1, 0]] * len(x))
 
             input_noise = init_random([len(x), 32 * 32 * 3])
-            xn = gan.gen.generate(sess, input_noise=input_noise)
+            xn = gan.gen.generate(sess)[0:len(x)]
             yn = np.array([[0, 1]] * len(x))
 
             x_ = x_.astype(np.float32)
@@ -63,8 +63,7 @@ if __name__ == '__main__':
             
             # print data.shape, label.shape
             # gan.symbol = 0
-            sess.run(train_step, feed_dict={gan.raw_input_image:data, label_:label})#, \
-                                            # gan.gen.raw_input_image:np.zeros([2 * len(x), 32 * 32 * 3]),})
+            sess.run(train_step, feed_dict={gan.raw_input_image:data, label_:label})
 
             if batch_step % 100 == 0:
                 gan.symbol = 1
@@ -74,7 +73,7 @@ if __name__ == '__main__':
                 gan.set_trainable(False)
                 y = np.array([[1, 0]] * BATCH_SIZE)
                 
-                sess.run(train_step, feed_dict={gan.gen.raw_input_image:input_noise, label_:y})
+                sess.run(train_step, feed_dict={label_:y})
                 gan.set_trainable(True)
                 # gan.transform(True)
                 gan.symbol = 0

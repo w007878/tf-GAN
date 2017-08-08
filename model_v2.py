@@ -71,8 +71,8 @@ class GAN:
         return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label, logits=logit))
 
 class Generator:
-    def __init__(self, keep_rate=1.0):
-        self.raw_input_image = tf.placeholder(tf.float32, [None, 32 * 32 * 3])
+    def __init__(self, keep_rate=1.0, BATCH_SIZE=100):
+        self.raw_input_image = tf.constant(np.random.random_sample([BATCH_SIZE, 32 * 32 * 3]).astype(np.float32))
         self.input_image = tf.reshape(self.raw_input_image, [-1, 32, 32, 3])
 
         self.W_conv1 = init_weight_variable([3, 3, 3, 32])
@@ -106,11 +106,11 @@ class Generator:
         # print(np.max(self.h_fc6))
         # self.h_fc6 = self.h_fc6 / np.max(self.h_fc6)
 
-    def generate(self, sess, input_noise):
+    def generate(self, sess):
         # input_noise = init_weight_variable([batch_size, 32 * 32 * 3])
         # print input_noise
         # print self.raw_input_image
-        image = sess.run(self.h_fc6, feed_dict={self.raw_input_image:input_noise})
+        image = sess.run(self.h_fc6)#, feed_dict={self.raw_input_image:input_noise})
         # image = self.h_fc6.eval(feed_dict={self.raw_input_image:input_noise}, session=sess)
         # image = tf.run(sess, self.h_fc6, feed_dict={self.raw_input_image:input_noise})
         # print self.h_fc
