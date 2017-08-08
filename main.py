@@ -20,6 +20,8 @@ def next_batch(x, y, batch_size=BATCH_SIZE):
 
 if __name__ == '__main__':
 
+    tmp_buff = open('tmp.out', 'a')
+    
     gan = model.GAN()
     images, labels = load_data.load_SVHN()
     
@@ -60,6 +62,7 @@ if __name__ == '__main__':
             gan.gen.set_trainable(False)
             
             # print data.shape, label.shape
+            gan.symbol = 0
             sess.run(train_step, feed_dict={gan.gan.raw_input_image:data, label_:label, \
                                             gan.gen.raw_input_image:np.zeros([2 * len(x), 32 * 32 * 3]),})
 
@@ -77,8 +80,12 @@ if __name__ == '__main__':
                 gan.gan.set_trainable(True)
                 # gan.transform(True)
                 gan.symbol = 0
+        
+        tmp_buff.write(gan.gen.W_conv1, '\n')
+        tmp_buff.write(gan.gen.b_conv1, '\n')
                 
         if step % 20 == 0:
             data = gan.gen.generate(sess, init_random([100, 32 * 32 * 3]))
             load_data.cv2_save(n=10, m=10, data=data, file_path="gen/{}.png".format(step))
     
+    tmp_buff.close()
