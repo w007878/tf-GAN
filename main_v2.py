@@ -6,7 +6,7 @@ import load_data
 import model_v2 as model
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "2"
-BATCH_SIZE = 100
+BATCH_SIZE = 50
 EPOCH_SIZE = 1000
 
 def init_random(shape):
@@ -44,12 +44,13 @@ if __name__ == '__main__':
                 
             batch_step = batch_step + 1
             
-            x_ = x.reshape(len(x), 32 * 32 * 3)
-            y = np.array([[1, 0]] * len(x))
+            if len(x) < 50: break
+            x_ = x.reshape(BATCH_SIZE, 32 * 32 * 3)
+            y = np.array([[1, 0]] * BATCH_SIZE)
 
-            input_noise = init_random([len(x), 32 * 32 * 3])
-            xn = gan.gen.generate(sess)[0:len(x)]
-            yn = np.array([[0, 1]] * len(x))
+            # input_noise = init_random([BATCH_SIZE, 32 * 32 * 3])
+            xn = gan.gen.generate(sess)[0:BATCH_SIZE]
+            yn = np.array([[0, 1]] * BATCH_SIZE)
 
             x_ = x_.astype(np.float32)
             x_ = x_ / np.max(x_)
@@ -68,10 +69,10 @@ if __name__ == '__main__':
             if batch_step % 100 == 0:
                 gan.symbol = 1
                 print("Epoch %d, Batch: %d" % (step, batch_step))
-                input_noise = init_random([BATCH_SIZE, 32 * 32 * 3])
+                input_noise = init_random([2 * BATCH_SIZE, 32 * 32 * 3])
                 gan.gen.set_trainable(True)
                 gan.set_trainable(False)
-                y = np.array([[1, 0]] * BATCH_SIZE)
+                y = np.array([[1, 0]] * 2 * BATCH_SIZE)
                 
                 sess.run(train_step, feed_dict={label_:y})
                 gan.set_trainable(True)
@@ -84,7 +85,7 @@ if __name__ == '__main__':
         # tmp_buff.write(gan.gen.b_conv1)
         # tmp_buff.write('\n')
                 
-        if step % 20 == 0:
+        if step % 5 == 0:
             data = gan.gen.generate(sess, init_random([100, 32 * 32 * 3]))
             load_data.cv2_save(n=10, m=10, data=data, file_path="gen/{}.png".format(step))
     
