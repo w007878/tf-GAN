@@ -86,7 +86,7 @@ if __name__ == '__main__':
         # tmp_buff.write('\n')
                 
         if step % 5 == 0:
-            data = gan.gen.generate(sess, init_random([100, 32 * 32 * 3]))
+            data = gan.gen.generate(sess)#, init_random([100, 32 * 32 * 3]))
             load_data.cv2_save(n=10, m=10, data=data, file_path="gen/{}.png".format(step))
     
     tmp_buff.close()
