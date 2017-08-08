@@ -81,7 +81,7 @@ if __name__ == '__main__':
                 # gan.transform(True)
                 gan.symbol = 0
         
-        print gan.gen.W_conv1, gen.gen.b_conv1, gan.gen.W_fc5, gan.gen.b_fc5, "================"
+        print gan.gen.W_conv1, gan.gen.b_conv1, gan.gen.W_fc5, gan.gen.b_fc5, "================"
         # tmp_buff.write(gan.gen.W_conv1)
         # tmp_buff.write('\n')
         # tmp_buff.write(gan.gen.b_conv1)
