@@ -38,7 +38,7 @@ if __name__ == '__main__':
         if step % 10 == 0:
             print("Epoch %d" % step)
             
-        gan.gan.set_trainable(True)
+        gan.set_trainable(True)
         batch_step = 0
         for x, _ in next_batch(images, labels):
                 
