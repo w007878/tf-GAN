@@ -17,12 +17,12 @@ def conv2d(x, W):
 def max_pool_2x2(x):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
-class Discriminator:
-    def __init__(self, gen, keep_rate=1.0):
+class GAN:
+    def __init__(self, keep_rate=1.0):
         # self.symbol = 0
-        self.gen = gen
-        self.raw_input_image = tf.placeholder(tf.float32, [None, 32 * 32 * 3])
-        self.input_image = tf.reshape(self.raw_input_image + self.gen.h_fc6 * self.symbol, [-1, 32, 32, 3])
+        self.gen = Generator()
+        self.raw_input_image = self.gen.h_fc6
+        self.input_image = tf.reshape(self.raw_input_image, [-1, 32, 32, 3])
 
         self.W_conv1 = init_weight_variable([3, 3, 3, 32])
         self.b_conv1 = init_bias_variable([32])
@@ -102,7 +102,7 @@ class Generator:
         self.W_fc6 = init_weight_variable([256, 32 * 32 * 3])
         self.b_fc6 = init_bias_variable([32 * 32 * 3])
         self.h_fc6 = tf.nn.relu(tf.matmul(self.h_fc5_drop, self.W_fc6) + self.b_fc6)
-        
+        self.h_fc6 = self.h_fc6 / np.max(h.fc_6)
         # print(np.max(self.h_fc6))
         # self.h_fc6 = self.h_fc6 / np.max(self.h_fc6)
 
@@ -121,8 +121,3 @@ class Generator:
         self.W_conv1.trainable, self.b_conv1.trainable, self.W_conv2.trainable, self.b_conv2.trainable, \
         self.W_conv3.trainable, self.b_conv3.trainable, self.W_conv4.trainable, self.b_conv4.trainable, \
         self.W_fc5.trainable, self.b_fc5.trainable, self.W_fc6.trainable, self.b_fc6.trainable = [able] * 12
-        
-class GAN:
-    def __init__(self):
-        self.gen = Generator()
-        self.gan = Discriminator(self.gen)
