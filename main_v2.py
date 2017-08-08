@@ -63,7 +63,7 @@ if __name__ == '__main__':
             
             # print data.shape, label.shape
             # gan.symbol = 0
-            sess.run(train_step, feed_dict={gan.gan.raw_input_image:data, label_:label, \
+            sess.run(train_step, feed_dict={gan.raw_input_image:data, label_:label, \
                                             gan.gen.raw_input_image:np.zeros([2 * len(x), 32 * 32 * 3]),})
 
             if batch_step % 100 == 0:
