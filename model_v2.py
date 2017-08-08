@@ -102,7 +102,7 @@ class Generator:
         self.W_fc6 = init_weight_variable([256, 32 * 32 * 3])
         self.b_fc6 = init_bias_variable([32 * 32 * 3])
         self.h_fc6 = tf.nn.relu(tf.matmul(self.h_fc5_drop, self.W_fc6) + self.b_fc6)
-        self.h_fc6 = self.h_fc6 / np.max(h.fc_6)
+        self.h_fc6 = self.h_fc6 / np.max(self.h_fc6)
         # print(np.max(self.h_fc6))
         # self.h_fc6 = self.h_fc6 / np.max(self.h_fc6)
 
