@@ -3,7 +3,7 @@ import tensorflow as tf
 import numpy as np
 import cv2
 import load_data
-import model 
+import model_v2 as model
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 BATCH_SIZE = 50
