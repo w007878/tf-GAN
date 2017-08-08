@@ -28,7 +28,7 @@ if __name__ == '__main__':
     label_ = tf.placeholder(tf.float32, [None, 2])
     # sess = tf.Session()
     
-    train_step = tf.train.AdamOptimizer(1e-4).minimize(gan.gan.loss(logit=gan.h_fc8, label=label_))
+    train_step = tf.train.AdamOptimizer(1e-4).minimize(gan.loss(logit=gan.h_fc8, label=label_))
     correct_prediction = tf.equal(tf.argmax(label_, 1), tf.argmax(gan.h_fc8, 1))
     
     sess = tf.InteractiveSession()
