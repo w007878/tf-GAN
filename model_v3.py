@@ -21,7 +21,7 @@ class Discriminator:
     def __init__(self, keep_rate=1.0):
         # self.symbol = 0
         self.raw_input_image = tf.placeholder(tf.float32, [None, 32 * 32 * 3])
-        self.input_image = tf.reshape(self.raw_input_image + self.gen.h_fc6 * self.symbol, [-1, 32, 32, 3])
+        self.input_image = tf.reshape(self.raw_input_image, [-1, 32, 32, 3])
 
         self.W_conv1 = init_weight_variable([3, 3, 3, 32])
         self.b_conv1 = init_bias_variable([32])
@@ -109,7 +109,7 @@ class Generator:
 class GAN:
     def __init__(self):
         self.gen = Generator()
-        self.dis = Discriminator(self.gen)
+        self.dis = Discriminator()
     
     def gen_loss(self, sess, input_noise):
         image = self.gen.generate(sess, input_noise)
