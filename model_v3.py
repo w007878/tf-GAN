@@ -17,12 +17,11 @@ def conv2d(x, W):
 def max_pool_2x2(x):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
-class GAN:
+class Discriminator:
     def __init__(self, keep_rate=1.0):
         # self.symbol = 0
-        self.gen = Generator()
-        self.raw_input_image = self.gen.h_fc6
-        self.input_image = tf.reshape(self.raw_input_image, [-1, 32, 32, 3])
+        self.raw_input_image = tf.placeholder(tf.float32, [None, 32 * 32 * 3])
+        self.input_image = tf.reshape(self.raw_input_image + self.gen.h_fc6 * self.symbol, [-1, 32, 32, 3])
 
         self.W_conv1 = init_weight_variable([3, 3, 3, 32])
         self.b_conv1 = init_bias_variable([32])
@@ -61,19 +60,15 @@ class GAN:
         self.b_fc8 = init_bias_variable([2])
         self.h_fc8 = tf.nn.sigmoid(tf.matmul(self.h_fc7_drop, self.W_fc8) + self.b_fc8)
     
-    def set_trainable(self, able):
-        self.W_conv1.trainable, self.b_conv1.trainable, self.W_conv2.trainable, self.b_conv2.trainable, \
-        self.W_conv3.trainable, self.b_conv3.trainable, self.W_conv4.trainable, self.b_conv4.trainable, \
-        self.W_conv5.trainable, self.b_conv5.trainable, self.W_fc6.trainable, self.b_fc6.trainable, \
-        self.W_fc7.trainable, self.b_fc7.trainable, self.W_fc8.trainable, self.b_fc8.trainable = [able] * 16
-    
+    def predict(self, sess, input_image):
+        return sess.run(self.h_fc8, feed_dict={self.raw_input_image:input_image})
+
     def loss(self, label, logit):
         return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label, logits=logit))
 
 class Generator:
-    def __init__(self, keep_rate=1.0, BATCH_SIZE=100):
-        self.raw_input_image = tf.Variable(tf.float32, [BATCH_SIZE, 32 * 32 * 3])
-        # self.raw_input_image = tf.constant(np.random.random_sample([BATCH_SIZE, 32 * 32 * 3]).astype(np.float32))
+    def __init__(self, keep_rate=1.0):
+        self.raw_input_image = tf.placeholder(tf.float32, [None, 32 * 32 * 3])
         self.input_image = tf.reshape(self.raw_input_image, [-1, 32, 32, 3])
 
         self.W_conv1 = init_weight_variable([3, 3, 3, 32])
@@ -103,23 +98,23 @@ class Generator:
         self.W_fc6 = init_weight_variable([256, 32 * 32 * 3])
         self.b_fc6 = init_bias_variable([32 * 32 * 3])
         self.h_fc6 = tf.nn.sigmoid(tf.matmul(self.h_fc5_drop, self.W_fc6) + self.b_fc6)
-        # self.h_fc6 = self.h_fc6 / np.max(self.h_fc6)
+        
         # print(np.max(self.h_fc6))
         # self.h_fc6 = self.h_fc6 / np.max(self.h_fc6)
 
-    def generate(self, sess):
-        # input_noise = init_weight_variable([batch_size, 32 * 32 * 3])
-        # print input_noise
-        # print self.raw_input_image
-        input_noise = np.random.random_sample([BATCH_SIZE, 32 * 32 * 3]).astype(np.float32)
+    def generate(self, sess, input_noise):
         image = sess.run(self.h_fc6, feed_dict={self.raw_input_image:input_noise})
-        # image = self.h_fc6.eval(feed_dict={self.raw_input_image:input_noise}, session=sess)
-        # image = tf.run(sess, self.h_fc6, feed_dict={self.raw_input_image:input_noise})
-        # print self.h_fc
-        # print image
         return image
+
+class GAN:
+    def __init__(self):
+        self.gen = Generator()
+        self.dis = Discriminator(self.gen)
     
-    def set_trainable(self, able):
-        self.W_conv1.trainable, self.b_conv1.trainable, self.W_conv2.trainable, self.b_conv2.trainable, \
-        self.W_conv3.trainable, self.b_conv3.trainable, self.W_conv4.trainable, self.b_conv4.trainable, \
-        self.W_fc5.trainable, self.b_fc5.trainable, self.W_fc6.trainable, self.b_fc6.trainable = [able] * 12
+    def gen_loss(self, sess, input_noise):
+        image = self.gen.generate(sess, input_noise)
+        predict = self.dis.predict(sess, image)
+        return self.dis.loss(label=np.array([[1., 0.]] * len(input_noise)), logit=predict)
+    
+    def dis_loss(self, sess, input_image, labels):
+        return self.dis.loss(label=labels, logit=dis.predict(sess, input_image))
