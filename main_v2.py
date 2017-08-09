@@ -49,7 +49,7 @@ if __name__ == '__main__':
             x_ = x.reshape(BATCH_SIZE, 32 * 32 * 3)
             y = np.array([[1, 0]] * BATCH_SIZE)
 
-            input_noise = init_random([BATCH_SIZE * 2, 32 * 32 * 3])
+            input_noise = init_random([BATCH_SIZE, 32 * 32 * 3])
             xn = gan.gen.generate(sess, input_noise)[0:BATCH_SIZE]
             yn = np.array([[0, 1]] * BATCH_SIZE)
 
@@ -66,7 +66,8 @@ if __name__ == '__main__':
                                                     tf.reduce_mean(\
                                                     tf.nn.softmax_cross_entropy_with_logits(\
                                                     labels=label, \
-                                                    logits=gan.dis.h_fc8)))
+                                                    logits=gan.dis.h_fc8)),\
+                                                    feed_dict={gan.dis.raw_input_image:data})
             
             # print data.shape, label.shape
             # gan.symbol = 0
