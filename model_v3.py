@@ -117,4 +117,4 @@ class GAN:
         return self.dis.loss(label=np.array([[1., 0.]] * len(input_noise)), logit=predict)
     
     def dis_loss(self, sess, input_image, labels):
-        return self.dis.loss(label=labels, logit=dis.predict(sess, input_image))
+        return self.dis.loss(label=labels, logit=self.dis.predict(sess, input_image))
