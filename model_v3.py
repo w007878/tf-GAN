@@ -60,8 +60,8 @@ class Discriminator:
         self.b_fc8 = init_bias_variable([2])
         self.h_fc8 = tf.nn.sigmoid(tf.matmul(self.h_fc7_drop, self.W_fc8) + self.b_fc8)
     
-    def predict(self, sess, input_image):
-        return self.h_fc8.eval(session=sess, feed_dict={self.raw_input_image:input_image})
+    # def predict(self, sess):
+    #     return self.h_fc8.eval(session=sess)#, feed_dict={self.raw_input_image:input_image})
         # return sess.run(self.h_fc8, feed_dict={self.raw_input_image:input_image})
 
     def loss(self, label, logit):

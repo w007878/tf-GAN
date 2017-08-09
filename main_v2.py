@@ -31,8 +31,8 @@ if __name__ == '__main__':
     image_ = tf.placeholder(tf.float32, [None, 32 * 32 * 3])
     # sess = tf.Session()
     
-    dis_train_step = tf.train.AdamOptimizer(1e-4).minimize(gan.dis_loss(sess, input_image=image_, labels=label_))
-    gen_train_step = tf.train.AdamOptimizer(1e-4).minimize(gan.gen_loss(sess, input_noise=image_))
+    # dis_train_step = tf.train.AdamOptimizer(1e-4).minimize(gan.dis_loss(sess, input_image=image_, labels=label_))
+    # gen_train_step = tf.train.AdamOptimizer(1e-4).minimize(gan.gen_loss(sess, input_noise=image_))
     # correct_prediction = tf.equal(tf.argmax(label_, 1), tf.argmax(gan.h_fc8, 1))
     
     gan.sess.run(tf.global_variables_initializer())
@@ -61,17 +61,34 @@ if __name__ == '__main__':
             # print yn.shape, y.shape
             data = np.concatenate((x_, xn))
             label = np.concatenate((y, yn))
+
+            dis_train_step = tf.train.AdamOptimizer(1e-4).minimize(\
+                                                    tf.reduce_mean(\
+                                                    tf.nn.softmax_cross_entropy_with_logits(\
+                                                    labels=label, \
+                                                    logits=gan.dis.h_fc8.eval(session=sess, \
+                                                    feed_dict={gan.dis.raw_input_image:data}))))
             
             # print data.shape, label.shape
             # gan.symbol = 0
-            gan.sess.run(dis_train_step, feed_dict={image_:data, label_:label})
+            sess.run(dis_train_step, feed_dict={image_:data, label_:label})
 
             if batch_step % 100 == 0:
                 print("Epoch %d, Batch: %d" % (step, batch_step))
                 input_noise = init_random([2 * BATCH_SIZE, 32 * 32 * 3])
                 y = np.array([[1, 0]] * 2 * BATCH_SIZE)
+
+                gen_train_step = tf.train.AdamOptimizer(1e-4).minimize(\
+                                                        tf.reduce_mean(\
+                                                        tf.nn.softmax_cross_entropy_with_logits(\
+                                                        labels=y, \
+                                                        logits=gan.dis.h_fc8.eval(session=sess, \
+                                                        feed_dict={gan.dis.raw_input_image:\
+                                                        gan.gen.generate(sess, input_noise)}))))
                 
-                sess.run(gen_train_step, feed_dict={image_:input_noise})
+                # gen_train_step = tf.train.AdamOptimizer(1e-4).minimize(\
+                # gan.gen_loss(sess, input_noise=image_))
+                sess.run(gen_train_step)
                 # gan.transform(True)
         
         # print gan.gen.W_conv1, gan.gen.b_conv1, gan.gen.W_fc5, gan.gen.b_fc5, "================"
