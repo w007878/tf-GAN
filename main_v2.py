@@ -53,8 +53,8 @@ if __name__ == '__main__':
             yn = np.array([[0, 1]] * BATCH_SIZE)
 
             x_ = x_.astype(np.float32)
-            x_ = x_ / np.max(x_)
-            xn = xn / np.max(xn)
+            # x_ = x_ / np.max(x_)
+            # xn = xn / np.max(xn)
             
             # print xn.shape, x_.shape
             # print yn.shape, y.shape
