@@ -3,7 +3,7 @@ import tensorflow as tf
 import numpy as np
 import cv2
 import load_data
-import model_v2 as model
+import model_v3 as model
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 BATCH_SIZE = 50
@@ -22,29 +22,30 @@ if __name__ == '__main__':
 
     tmp_buff = open('tmp.out', 'a')
     
+    sess = tf.Session()
+    
     gan = model.GAN()
     images, labels = load_data.load_SVHN()
     
     label_ = tf.placeholder(tf.float32, [None, 2])
+    image_ = tf.placeholder(tf.float32, [None, 32 * 32 * 3])
     # sess = tf.Session()
     
-    train_step = tf.train.AdamOptimizer(1e-4).minimize(gan.loss(logit=gan.h_fc8, label=label_))
-    correct_prediction = tf.equal(tf.argmax(label_, 1), tf.argmax(gan.h_fc8, 1))
+    dis_train_step = tf.train.AdamOptimizer(1e-4).minimize(gan.dis_loss(sess, input_image=image_, labels=label_))
+    gen_train_step = tf.train.AdamOptimizer(1e-4).minimize(gan.gen_loss(sess, input_noise=image_))
+    # correct_prediction = tf.equal(tf.argmax(label_, 1), tf.argmax(gan.h_fc8, 1))
     
-    sess = tf.InteractiveSession()
-    sess.run(tf.global_variables_initializer())
+    gan.sess.run(tf.global_variables_initializer())
     
     for step in range(EPOCH_SIZE):
         if step % 10 == 0:
             print("Epoch %d" % step)
             
-        gan.set_trainable(True)
         batch_step = 0
         for x, _ in next_batch(images, labels):
-                
             batch_step = batch_step + 1
             
-            if len(x) < 50: break
+            if len(x) < BATCH_SIZE: break
             x_ = x.reshape(BATCH_SIZE, 32 * 32 * 3)
             y = np.array([[1, 0]] * BATCH_SIZE)
 
@@ -60,24 +61,18 @@ if __name__ == '__main__':
             # print yn.shape, y.shape
             data = np.concatenate((x_, xn))
             label = np.concatenate((y, yn))
-            gan.gen.set_trainable(False)
             
             # print data.shape, label.shape
             # gan.symbol = 0
-            sess.run(train_step, feed_dict={gan.raw_input_image:data, label_:label})
+            gan.sess.run(dis_train_step, feed_dict={image_:data, label_:label})
 
             if batch_step % 100 == 0:
-                gan.symbol = 1
                 print("Epoch %d, Batch: %d" % (step, batch_step))
                 input_noise = init_random([2 * BATCH_SIZE, 32 * 32 * 3])
-                gan.gen.set_trainable(True)
-                gan.set_trainable(False)
                 y = np.array([[1, 0]] * 2 * BATCH_SIZE)
                 
-                sess.run(train_step, feed_dict={label_:y})
-                gan.set_trainable(True)
+                sess.run(gen_train_step, feed_dict={image_:input_noise})
                 # gan.transform(True)
-                gan.symbol = 0
         
         # print gan.gen.W_conv1, gan.gen.b_conv1, gan.gen.W_fc5, gan.gen.b_fc5, "================"
         # tmp_buff.write(gan.gen.W_conv1)
@@ -86,7 +81,7 @@ if __name__ == '__main__':
         # tmp_buff.write('\n')
                 
         if step % 5 == 0:
-            data = gan.gen.generate(sess)#, init_random([100, 32 * 32 * 3]))
+            data = gan.gen.generate(sess, init_random([100, 32 * 32 * 3]))
             load_data.cv2_save(n=10, m=10, data=data, file_path="gen/{}.png".format(step))
     
     tmp_buff.close()
