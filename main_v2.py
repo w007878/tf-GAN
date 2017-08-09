@@ -66,12 +66,11 @@ if __name__ == '__main__':
                                                     tf.reduce_mean(\
                                                     tf.nn.softmax_cross_entropy_with_logits(\
                                                     labels=label, \
-                                                    logits=gan.dis.h_fc8)),\
-                                                    feed_dict={gan.dis.raw_input_image:data})
+                                                    logits=gan.dis.h_fc8)))
             
             # print data.shape, label.shape
             # gan.symbol = 0
-            sess.run(dis_train_step, feed_dict={image_:data, label_:label})
+            sess.run(dis_train_step, feed_dict={gan.dis.raw_input_image:data, label_:label})
 
             if batch_step % 100 == 0:
                 print("Epoch %d, Batch: %d" % (step, batch_step))
