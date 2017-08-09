@@ -61,7 +61,8 @@ class Discriminator:
         self.h_fc8 = tf.nn.sigmoid(tf.matmul(self.h_fc7_drop, self.W_fc8) + self.b_fc8)
     
     def predict(self, sess, input_image):
-        return sess.run(self.h_fc8, feed_dict={self.raw_input_image:input_image})
+        return self.h_fc8.eval(sess, feed_dict={self.raw_input_image:input_image})
+        # return sess.run(self.h_fc8, feed_dict={self.raw_input_image:input_image})
 
     def loss(self, label, logit):
         return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label, logits=logit))
@@ -103,7 +104,8 @@ class Generator:
         # self.h_fc6 = self.h_fc6 / np.max(self.h_fc6)
 
     def generate(self, sess, input_noise):
-        image = sess.run(self.h_fc6, feed_dict={self.raw_input_image:input_noise})
+        image = self.h_fc6.eval(sess, feed_dict={self.raw_input_image:input_noise})
+        # image = sess.run(self.h_fc6, feed_dict={self.raw_input_image:input_noise})
         return image
 
 class GAN:
