@@ -81,13 +81,12 @@ if __name__ == '__main__':
                                                         tf.reduce_mean(\
                                                         tf.nn.softmax_cross_entropy_with_logits(\
                                                         labels=y, \
-                                                        logits=gan.dis.h_fc8.eval(session=sess, \
-                                                        feed_dict={gan.dis.raw_input_image:\
-                                                        gan.gen.generate(sess, input_noise)}))))
+                                                        logits=gan.dis.h_fc8.)))
                 
                 # gen_train_step = tf.train.AdamOptimizer(1e-4).minimize(\
                 # gan.gen_loss(sess, input_noise=image_))
-                sess.run(gen_train_step)
+                sess.run(gen_train_step, feed_dict={gan.dis.raw_input_image:\
+                        gan.gen.generate(sess, input_noise)})
                 # gan.transform(True)
         
         # print gan.gen.W_conv1, gan.gen.b_conv1, gan.gen.W_fc5, gan.gen.b_fc5, "================"
