@@ -20,8 +20,8 @@ def max_pool_2x2(x):
 class Discriminator:
     def __init__(self, keep_rate=1.0):
         # self.symbol = 0
-        self.raw_input_image = tf.placeholder(tf.float32, [None, 32 * 32 * 3])
-        self.input_image = tf.reshape(self.raw_input_image, [-1, 32, 32, 3])
+        self.raw_input_image = tf.placeholder(tf.float32, [100, 32 * 32 * 3])
+        self.input_image = tf.reshape(self.raw_input_image, [100, 32, 32, 3])
 
         self.W_conv1 = init_weight_variable([3, 3, 3, 32])
         self.b_conv1 = init_bias_variable([32])
@@ -69,8 +69,8 @@ class Discriminator:
 
 class Generator:
     def __init__(self, keep_rate=1.0):
-        self.raw_input_image = tf.placeholder(tf.float32, [50, 32 * 32 * 3])
-        self.input_image = tf.reshape(self.raw_input_image, [50, 32, 32, 3])
+        self.raw_input_image = tf.placeholder(tf.float32, [100, 32 * 32 * 3])
+        self.input_image = tf.reshape(self.raw_input_image, [100, 32, 32, 3])
 
         self.W_conv1 = init_weight_variable([3, 3, 3, 32])
         self.b_conv1 = init_bias_variable([32])
