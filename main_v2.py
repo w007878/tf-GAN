@@ -66,8 +66,7 @@ if __name__ == '__main__':
                                                     tf.reduce_mean(\
                                                     tf.nn.softmax_cross_entropy_with_logits(\
                                                     labels=label, \
-                                                    logits=gan.dis.h_fc8.eval(session=sess, \
-                                                    feed_dict={gan.dis.raw_input_image:data}))))
+                                                    logits=gan.dis.h_fc8)))
             
             # print data.shape, label.shape
             # gan.symbol = 0
