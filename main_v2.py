@@ -81,7 +81,7 @@ if __name__ == '__main__':
                                                         tf.reduce_mean(\
                                                         tf.nn.softmax_cross_entropy_with_logits(\
                                                         labels=y, \
-                                                        logits=gan.dis.h_fc8.)))
+                                                        logits=gan.dis.h_fc8)))
                 
                 # gen_train_step = tf.train.AdamOptimizer(1e-4).minimize(\
                 # gan.gen_loss(sess, input_noise=image_))
