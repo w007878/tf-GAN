@@ -49,8 +49,8 @@ if __name__ == '__main__':
             x_ = x.reshape(BATCH_SIZE, 32 * 32 * 3)
             y = np.array([[1, 0]] * BATCH_SIZE)
 
-            # input_noise = init_random([BATCH_SIZE, 32 * 32 * 3])
-            xn = gan.gen.generate(sess)[0:BATCH_SIZE]
+            input_noise = init_random([BATCH_SIZE, 32 * 32 * 3])
+            xn = gan.gen.generate(sess, input_noise)[0:BATCH_SIZE]
             yn = np.array([[0, 1]] * BATCH_SIZE)
 
             x_ = x_.astype(np.float32)
