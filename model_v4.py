@@ -50,7 +50,7 @@ def Discriminator(raw_input_image, BATCH_SIZE=100, keep_rate=1.0):
 
         with tf.variable_scope("conv5"):
             h_conv5 = convolution_layer(h_conv4, [3, 3, 64, 128], 128, pooling=False)
-            h_conv5_flat = tf.reshape(h_conv5, [BATCH_SIZE, 8 * 8 * 128])
+            h_conv5_flat = tf.reshape(h_conv5, [-1, 8 * 8 * 128])
         
         with tf.variable_scope("fc6"):
             h_fc6_drop = fc_layer(h_conv5_flat, 8 * 8 * 128, 512, drop_out=True)
@@ -78,7 +78,7 @@ def Generator(raw_input_image, BATCH_SIZE=100, keep_rate=1.0):
 
         with tf.variable_scope("conv4"):
             h_conv4 = convolution_layer(h_conv3, [3, 3, 64, 128], 128, pooling=False)
-            h_conv4_flat = tf.reshape(h_conv4, [BATCH_SIZE, 8 * 8 * 128])            
+            h_conv4_flat = tf.reshape(h_conv4, [-1, 8 * 8 * 128])            
 
         with tf.variable_scope("fc5"):
             h_fc5_drop = fc_layer(h_conv4_flat, 8 * 8 * 128, 256, drop_out=True)
