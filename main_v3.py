@@ -57,7 +57,7 @@ if __name__ == '__main__':
                 input_noise = init_random([2 * BATCH_SIZE, 32 * 32 * 3])
                 y = np.array([[1, 0]] * 2 * BATCH_SIZE)
 
-                sess.run(gen_train_step, feed_dict={gan.raw_input_image:input_noise})
+                sess.run(gen_train_step, feed_dict={gan.raw_input_image:input_noise, label_:y})
 
         if step % 5 == 0:
             data = gan.gen.eval(sess, feed_dict={gan.raw_input_image:init_random([100, 32 * 32 * 3])})
