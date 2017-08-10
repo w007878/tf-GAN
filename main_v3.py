@@ -60,5 +60,5 @@ if __name__ == '__main__':
                 sess.run(gen_train_step, feed_dict={gan.raw_input_image:input_noise, label_:y})
 
         if step % 5 == 0:
-            data = gan.gen.eval(sess, feed_dict={gan.raw_input_image:init_random([100, 32 * 32 * 3])})
+            data = gan.gen.eval(session=sess, feed_dict={gan.raw_input_image:init_random([100, 32 * 32 * 3])})
             ldata.cv2_save(n=10, m=10, data=data, file_path="gen/{}.png".format(step))
