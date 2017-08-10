@@ -4,7 +4,7 @@ import load_data as ldata
 import model_v4 as model
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 BATCH_SIZE = 50
 EPOCH_SIZE = 10000
 
