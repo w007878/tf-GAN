@@ -28,8 +28,8 @@ if __name__ == '__main__':
     dis_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label_, logits=gan.dis))
     gen_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label_, logits=gan.dis_gen))
 
-    dis_train_step = tf.train.AdamOptimizer(1e-4).minimize(dis_loss)
-    gen_train_step = tf.train.AdamOptimizer(1e-4).minimize(gen_loss)
+    dis_train_step = tf.train.AdamOptimizer(1e-2).minimize(dis_loss)
+    gen_train_step = tf.train.AdamOptimizer(1e-2).minimize(gen_loss)
     
     sess.run(tf.global_variables_initializer())
 
