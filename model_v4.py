@@ -41,7 +41,7 @@ def deconvolution_layer(input, filter_size, output_shape, strides=[1, 1, 1, 1], 
 
 def Discriminator(raw_input_image, BATCH_SIZE=100, keep_rate=1.0):
     with tf.variable_scope("dis"):
-        input_image = tf.reshape(raw_input_image, [-1, 32, 32, 3])
+        input_image = tf.reshape(raw_input_image, [BATCH_SIZE, 32, 32, 3])
 
         with tf.variable_scope("conv1"):
             h_conv1 = convolution_layer(input_image, [3, 3, 3, 32], 32, pooling=True)
@@ -72,58 +72,58 @@ def Discriminator(raw_input_image, BATCH_SIZE=100, keep_rate=1.0):
 
 def Generator(BATCH_SIZE=100, keep_rate=1.0):
     with tf.variable_scope("gen"):
-        input_noise = tf.placeholder(tf.float32, [None, 8 * 8 * 3])
-        input_image = tf.reshape(input_noise, [-1, 8, 8, 3])
+        input_noise = tf.placeholder(tf.float32, [BATCH_SIZE, 8 * 8 * 3])
+        input_image = tf.reshape(input_noise, [BATCH_SIZE, 8, 8, 3])
 
         with tf.variable_scope("dconv1"):
             h_dconv1 = deconvolution_layer(input_image, filter_size=[3, 3, 16, 3], \
-            output_shape=[-1, 10, 10, 16], strides=[1, 1, 1, 1])
+            output_shape=[BATCH_SIZE, 10, 10, 16], strides=[1, 1, 1, 1])
 
         with tf.variable_scope("dconv2"):
             h_dconv2 = deconvolution_layer(h_dconv1, filter_size=[3, 3, 32, 16], \
-            output_shape=[-1, 12, 12, 32], strides=[1, 1, 1, 1])
+            output_shape=[BATCH_SIZE, 12, 12, 32], strides=[1, 1, 1, 1])
 
         with tf.variable_scope("dconv3"):
             h_dconv3 = deconvolution_layer(h_dconv2, filter_size=[3, 3, 32, 32], \
-            output_shape=[-1, 14, 14, 32], strides=[1, 1, 1, 1])
+            output_shape=[BATCH_SIZE, 14, 14, 32], strides=[1, 1, 1, 1])
 
         with tf.variable_scope("dconv4"):
             h_dconv4 = deconvolution_layer(h_dconv3, filter_size=[3, 3, 32, 32], \
-            output_shape=[-1, 16, 16, 32], strides=[1, 1, 1, 1])
+            output_shape=[BATCH_SIZE, 16, 16, 32], strides=[1, 1, 1, 1])
 
         with tf.variable_scope("dconv5"):
             h_dconv5 = deconvolution_layer(h_dconv4, filter_size=[3, 3, 64, 32], \
-            output_shape=[-1, 18, 18, 64], strides=[1, 1, 1, 1])
+            output_shape=[BATCH_SIZE, 18, 18, 64], strides=[1, 1, 1, 1])
 
         with tf.variable_scope("dconv6"):
             h_dconv6 = deconvolution_layer(h_dconv5, filter_size=[3, 3, 64, 64], \
-            output_shape=[-1, 20, 20, 64], strides=[1, 1, 1, 1])
+            output_shape=[BATCH_SIZE, 20, 20, 64], strides=[1, 1, 1, 1])
 
         with tf.variable_scope("dconv7"):
             h_dconv7 = deconvolution_layer(h_dconv6, filter_size=[3, 3, 64, 64], \
-            output_shape=[-1, 22, 22, 64], strides=[1, 1, 1, 1])
+            output_shape=[BATCH_SIZE, 22, 22, 64], strides=[1, 1, 1, 1])
 
         with tf.variable_scope("dconv8"):
             h_dconv8 = deconvolution_layer(h_dconv7, filter_size=[3, 3, 64, 64], \
-            output_shape=[-1, 24, 24, 64], strides=[1, 1, 1, 1])
+            output_shape=[BATCH_SIZE, 24, 24, 64], strides=[1, 1, 1, 1])
 
         with tf.variable_scope("dconv9"):
             h_dconv9 = deconvolution_layer(h_dconv8, filter_size=[3, 3, 32, 64], \
-            output_shape=[-1, 26, 26, 32], strides=[1, 1, 1, 1])
+            output_shape=[BATCH_SIZE, 26, 26, 32], strides=[1, 1, 1, 1])
 
         with tf.variable_scope("dconv10"):
             h_dconv10 = deconvolution_layer(h_dconv9, filter_size=[3, 3, 16, 32], \
-            output_shape=[-1, 28, 28, 16], strides=[1, 1, 1, 1])
+            output_shape=[BATCH_SIZE, 28, 28, 16], strides=[1, 1, 1, 1])
 
         with tf.variable_scope("dconv11"):
             h_dconv11 = deconvolution_layer(h_dconv10, filter_size=[3, 3, 8, 16], \
-            output_shape=[-1, 30, 30, 8], strides=[1, 1, 1, 1])
+            output_shape=[BATCH_SIZE, 30, 30, 8], strides=[1, 1, 1, 1])
 
         with tf.variable_scope("dconv12"):
             h_dconv12 = deconvolution_layer(h_dconv11, filter_size=[3, 3, 3, 8], \
-            output_shape=[-1, 32, 32, 3], strides=[1, 1, 1, 1], act=tf.nn.sigmoid)
+            output_shape=[BATCH_SIZE, 32, 32, 3], strides=[1, 1, 1, 1], act=tf.nn.sigmoid)
 
-        return tf.reshape(h_d_conv4, [-1, 32 * 32 * 3])
+        return tf.reshape(h_d_conv12, [BATCH_SIZE, 32 * 32 * 3])
 
 class GAN:
     def __init__(self, BATCH_SIZE=100):

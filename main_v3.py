@@ -41,7 +41,7 @@ if __name__ == '__main__':
             input_noise = init_random([BATCH_SIZE, 32 * 32 * 3])
             
             if len(x) < BATCH_SIZE: break
-            x_ = x.reshape(BATCH_SIZE, 32 * 32 * 3)
+            x_ = x.reshape(BATCH_SIZE * 2, 32 * 32 * 3)[0:BATCH_SIZE]
             y = np.array([[1, 0]] * BATCH_SIZE)
 
             xn = gan.gen.eval(session=sess, feed_dict={gan.gen.input_noise:input_noise})
