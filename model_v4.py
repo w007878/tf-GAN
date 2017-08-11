@@ -123,7 +123,7 @@ def Generator(BATCH_SIZE=100, keep_rate=1.0):
             h_dconv12 = deconvolution_layer(h_dconv11, filter_size=[3, 3, 3, 8], \
             output_shape=[BATCH_SIZE, 32, 32, 3], strides=[1, 1, 1, 1], act=tf.nn.sigmoid)
 
-        return tf.reshape(h_d_conv12, [BATCH_SIZE, 32 * 32 * 3])
+        return tf.reshape(h_dconv12, [BATCH_SIZE, 32 * 32 * 3])
 
 class GAN:
     def __init__(self, BATCH_SIZE=100):
