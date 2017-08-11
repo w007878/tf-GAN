@@ -73,7 +73,7 @@ def Discriminator(raw_input_image, BATCH_SIZE=100, keep_rate=1.0):
 def Generator(BATCH_SIZE=100, keep_rate=1.0):
     with tf.variable_scope("gen"):
         input_noise = tf.placeholder(tf.float32, [None, 8 * 8 * 3])
-        input_image = tf.reshape(raw_input_image, [-1, 8, 8, 3])
+        input_image = tf.reshape(input_noise, [-1, 8, 8, 3])
 
         with tf.variable_scope("dconv1"):
             h_dconv1 = deconvolution_layer(input_image, filter_size=[3, 3, 16, 3], \
