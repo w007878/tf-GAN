@@ -28,9 +28,11 @@ if __name__ == '__main__':
     dis_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label_, logits=gan.dis))
     gen_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label_, logits=gan.dis_gen))
 
-    dis_train_step = tf.train.AdamOptimizer(1e-2).minimize(dis_loss)
     gen_train_step = tf.train.AdamOptimizer(1e-2).minimize(gen_loss)
+    dis_train_step = tf.train.AdamOptimizer(1e-2).minimize(dis_loss)
+    print dis_train_step
     
+    print gen_train_step
     sess.run(tf.global_variables_initializer())
 
     for step in range(EPOCH_SIZE):
@@ -38,13 +40,13 @@ if __name__ == '__main__':
         batch_step = 0
         for x, _ in next_batch(images, labels):
             batch_step = batch_step + 1
-            input_noise = init_random([BATCH_SIZE, 32 * 32 * 3])
+            input_noise = init_random([BATCH_SIZE * 2, 32 * 32 * 3])
             
             if len(x) < BATCH_SIZE: break
-            x_ = x.reshape(BATCH_SIZE * 2, 32 * 32 * 3)[0:BATCH_SIZE]
+            x_ = x.reshape(BATCH_SIZE, 32 * 32 * 3)
             y = np.array([[1, 0]] * BATCH_SIZE)
 
-            xn = gan.gen.eval(session=sess, feed_dict={gan.gen.input_noise:input_noise})
+            xn = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:input_noise})[0:BATCH_SIZE]
             yn = np.array([[0, 1]] * BATCH_SIZE)
 
             data = np.concatenate((x_, xn))
@@ -57,8 +59,8 @@ if __name__ == '__main__':
                 input_noise = init_random([2 * BATCH_SIZE, 32 * 32 * 3])
                 y = np.array([[1, 0]] * 2 * BATCH_SIZE)
 
-                sess.run(gen_train_step, feed_dict={gan.gen.input_noise:input_noise, label_:y})
+                sess.run(gen_train_step, feed_dict={gan.raw_input_noise:input_noise, label_:y})
 
         if step % 5 == 0:
-            data = gan.gen.eval(session=sess, feed_dict={gan.gen.raw_input_image:init_random([100, 32 * 32 * 3])})
+            data = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:init_random([100, 32 * 32 * 3])})
             ldata.cv2_save(n=10, m=10, data=data, file_path="gen/{}.png".format(step))
