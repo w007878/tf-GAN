@@ -22,8 +22,8 @@ def conv_layer(x, W, strides=[1, 2, 2, 1]):
     return tf.nn.conv2d(x, filter=W, strides=strides, padding="SAME")
 
 def stack_bias(x, W, name="bias"):
-    return random_init(name, [x.shape[0], x.shape[1], x.shape[2], W.shape[2]]):
-    
+    return random_init(name, [x.shape[0], x.shape[1], x.shape[2], W.shape[2]])
+
 # The generator model    
 def Generator(input):
     # input is a [BATCH_SIZE, 100] random tensor / np.array
