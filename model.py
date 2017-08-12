@@ -93,9 +93,9 @@ def Discriminator(input):
             fc1_h = leakly_relu(tf.matmul(conv4_flat, fc1_W) + fc1_b)
         
         with tf.variable_scope("fc2"):
-            fc2_W = random_init("weight", [128, 2])
-            fc2_b = random_init("bias", [2])
-            fc2_h = tf.nn.sigmoid(tf.matmul(fc1_h, fc2_W) + fc2_b)
+            fc2_W = random_init("weight", [128, 1])
+            fc2_b = random_init("bias", [1])
+            fc2_h = tf.nn.tanh(tf.matmul(fc1_h, fc2_W) + fc2_b)
 
     return fc2_h
 

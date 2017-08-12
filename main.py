@@ -11,7 +11,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
 def init_random(shape):
     return np.random.normal(0.0, 20.0, shape)
-
+    
 def next_batch(x, y, batch_size=BATCH_SIZE):
     i = 0
     while(i < len(x)):
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     images = (images - 0.5) * 2.
     ldata.cv2_save(n=10, m=10, data=(images[0:100] + 1) / 2., file_path="meow.png")
      
-    label_ = tf.placeholder(tf.float32, [None, 2])
+    label_ = tf.placeholder(tf.float32, [None, 1])
     
     dis_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label_, logits=gan.dis))
     gen_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label_, logits=gan.dis_gen))
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     gen_train_step = tf.train.MomentumOptimizer(0.0002, 0.5).minimize(gen_loss)
     dis_train_step = tf.train.MomentumOptimizer(0.0002, 0.5).minimize(dis_loss)
 
-    correct_prediction = tf.equal(tf.argmax(label_, 1), tf.argmax(gan.dis, 1))
+    correct_prediction = tf.equal(tf.sign(label_), tf.sign(gan.dis))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 #    print dis_train_step
@@ -58,12 +58,12 @@ if __name__ == '__main__':
             if len(x) < BATCH_SIZE: break
             input_noise = init_random((BATCH_SIZE, 100))
             xn = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:input_noise})
-            yn = np.array([[0, 1]] * BATCH_SIZE)
+            yn = np.array([[-1]] * BATCH_SIZE)
             
             x_ = np.reshape(x, (BATCH_SIZE, 32 * 32 * 3))
-            y = np.array([[1, 0]] * BATCH_SIZE)
+            y = np.array([[1]] * BATCH_SIZE)
             
-            print xn
+            # print xn
 
             rindex = [i for i in range(2 * BATCH_SIZE)]
             np.random.shuffle(rindex)
@@ -84,7 +84,7 @@ if __name__ == '__main__':
             if batch_step % 20 == 0:
                 print("Epoch %d, Batch: %d" % (step, batch_step))
                 input_noise = init_random((BATCH_SIZE, 100))
-                y = np.array([[1, 0]] * BATCH_SIZE)
+                y = np.array([[1]] * BATCH_SIZE)
                 sess.run(gen_train_step, feed_dict={gan.raw_input_noise:input_noise, label_:y})
 
         data = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:init_random((BATCH_SIZE, 100))})[0:100]
