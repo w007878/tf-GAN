@@ -55,7 +55,6 @@ if __name__ == '__main__':
         for x, _ in next_batch(images, labels):
             batch_step = batch_step + 1
 
-
             if len(x) < BATCH_SIZE: break
             input_noise = init_random((BATCH_SIZE, 100))
             xn = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:input_noise})
@@ -71,7 +70,7 @@ if __name__ == '__main__':
             tx = np.concatenate((xn, x_))[rindex]
             ty = np.concatenate((yn, y))[rindex]
 
-            train_accuracy   = accuracy.eval(session=sess, feed_dict={gan.raw_input_image:tx[0:BATCH_SIZE], label_:ty[0:BATCH_SIZE]})
+            train_accuracy  = accuracy.eval(session=sess, feed_dict={gan.raw_input_image:tx[0:BATCH_SIZE], label_:ty[0:BATCH_SIZE]})
             
             print("step training accuracy %g" % (train_accuracy))
             #ldata.cv2_save(n=10, m=10, data=(tx[0:100] + 1) / 2., file_path="meow.png")
@@ -82,11 +81,11 @@ if __name__ == '__main__':
             sess.run(dis_train_step, feed_dict={gan.raw_input_image:tx[0:BATCH_SIZE], label_:ty[0:BATCH_SIZE]})
             # sess.run(dis_train_step, feed_dict={gan.raw_input_image:xn, label_:yn})
 
-            if batch_step % 20 == 0:
-                print("Epoch %d, Batch: %d" % (step, batch_step))
-                input_noise = init_random((BATCH_SIZE, 100))
-                y = np.array([[1]] * BATCH_SIZE)
-                sess.run(gen_train_step, feed_dict={gan.raw_input_noise:input_noise, label_:y})
+            # if batch_step % 20 == 0:
+            # print("Epoch %d, Batch: %d" % (step, batch_step))
+            input_noise = init_random((BATCH_SIZE, 100))
+            y = np.array([[1]] * BATCH_SIZE)
+            sess.run(gen_train_step, feed_dict={gan.raw_input_noise:input_noise, label_:y})
 
         data = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:init_random((BATCH_SIZE, 100))})[0:100]
         
