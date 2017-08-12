@@ -95,7 +95,7 @@ def Discriminator(input):
         with tf.variable_scope("fc2"):
             fc2_W = random_init("weight", [128, 2])
             fc2_b = random_init("bias", [2])
-            fc2_h = tf.nn.tanh(tf.matmul(fc1_h, fc2_W) + fc2_b)
+            fc2_h = tf.nn.sigmoid(tf.matmul(fc1_h, fc2_W) + fc2_b)
 
     return fc2_h
 
