@@ -90,7 +90,7 @@ def Discriminator(input):
         with tf.variable_scope("fc1"):
             fc1_W = random_init("weight", [2 * 2 * 256, 128])
             fc1_b = random_init("bias", [128])
-            fc1_h = leaky_relu(tf.matmul(conv4_flat, fc1_W) + fc1_b)
+            fc1_h = leakly_relu(tf.matmul(conv4_flat, fc1_W) + fc1_b)
         
         with tf.variable_scope("fc2"):
             fc2_W = random_init("weight", [128, 2])
