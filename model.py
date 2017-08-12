@@ -33,35 +33,35 @@ def Generator(input):
         fc_W = random_init("weight", [100, 1024 * 4 * 4])
         fc_b = random_init("bias", [1024 * 4 * 4])
         fc_h = leakly_relu(tf.matmul(input, fc_W) + fc_b)
-        fc_h = tf.reshape(fc_h, [-1, 4, 4, 1024])
+        fc_h = tf.reshape(fc_h, [BATCH_SIZE, 4, 4, 1024])
 
     # Four Convolution Layers
     with tf.variable_scope("conv1"):
         conv1_W = random_init("filter", [5, 5, 512, 1024])
         conv1_b = stack_bias(fc_h, conv1_W)
-        conv1_h = leakly_relu(transpose_conv(fc_h, conv1_W, [-1, 8, 8, 512]) + conv1_b)
+        conv1_h = leakly_relu(transpose_conv(fc_h, conv1_W, [BATCH_SIZE, 8, 8, 512]) + conv1_b)
     
     with tf.variable_scope("conv2"):
         conv2_W = random_init("filter", [5, 5, 256, 512])
         conv2_b = stack_bias(conv1__h, conv2_W)
-        conv2_h = leakly_relu(transpose_conv(conv1_h, conv2_W, [-1, 16, 16, 512]) + conv2_b)
+        conv2_h = leakly_relu(transpose_conv(conv1_h, conv2_W, [BATCH_SIZE, 16, 16, 512]) + conv2_b)
 
     with tf.variable_scope("conv3"):
         conv3_W = random_init("filter", [5, 5, 128, 256])
         conv3_b = stack_bias(conv2_h, conv3_W)
-        conv3_h = leakly_relu(transpose_conv(conv2_h, conv3_W, [-1, 32, 32, 512]) + conv3_b)
+        conv3_h = leakly_relu(transpose_conv(conv2_h, conv3_W, [BATCH_SIZE, 32, 32, 512]) + conv3_b)
 
     with tf.variable_scope("conv4"):
         conv4_W = random_init("filter", [5, 5, 3, 128])
         conv4_b = stack_bias(conv3_h, conv4_W)
-        conv4_h = tf.nn.tanh(transpose_conv(conv3_h, conv4_W, [-1, 32, 32, 512], 
+        conv4_h = tf.nn.tanh(transpose_conv(conv3_h, conv4_W, [BATCH_SIZE, 32, 32, 512], 
                                             strides=[1, 1, 1, 1]) + conv4_b)
 
-    return tf.reshape(conv4_h, [-1, 32 * 32 * 3])
+    return tf.reshape(conv4_h, [BATCH_SIZE, 32 * 32 * 3])
 
 # The discriminator model
 def Discriminator(input):
-    image = tf.reshape(input, [-1, 32, 32, 3])
+    image = tf.reshape(input, [BATCH_SIZE, 32, 32, 3])
 
     with tf.variable_scope("conv1"):
         conv1_W = random_init("filter", [5, 5, 3, 32])
@@ -82,7 +82,7 @@ def Discriminator(input):
         conv4_W = random_init("filter", [5, 5, 128, 256])
         conv4_b = stack_bias(conv3_h, conv4_W)
         conv4_h = tf.nn.tanh(conv_layer(conv3_h, conv4_W) + conv4_b)
-        conv4_flat = tf.reshape(conv4_h, [-1, 2 * 2 * 256])
+        conv4_flat = tf.reshape(conv4_h, [BATCH_SIZE, 2 * 2 * 256])
         
     with tf.variable_scope("fc1"):
         fc1_W = random_init("weight", [2 * 2 * 256, 128])
@@ -100,8 +100,8 @@ class GAN:
     def __init__(self):
         with tf.variable_scope("gan") as scope:
             # with tf.variable_scope("gan"):
-            self.raw_input_image = tf.placeholder(tf.float32, [None, 32 * 32 * 3])
-            self.raw_input_noise = tf.placeholder(tf.float32, [None, 100])
+            self.raw_input_image = tf.placeholder(tf.float32, [BATCH_SIZE, 32 * 32 * 3])
+            self.raw_input_noise = tf.placeholder(tf.float32, [BATCH_SIZE, 100])
             self.gen = Generator(self.raw_input_noise)
             self.dis_gen = Discriminator(self.gen)
             scope.reuse_variables()

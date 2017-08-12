@@ -4,9 +4,10 @@ import load_data as ldata
 import model
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"
-BATCH_SIZE = 128
+from model import BATCH_SIZE
 EPOCH_SIZE = 100
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
 def next_batch(x, y, batch_size=BATCH_SIZE):
     i = 0
@@ -41,17 +42,16 @@ if __name__ == '__main__':
         for x, _ in next_batch(images, labels):
             batch_step = batch_step + 1
 
+            if len(xn) < BATCH_SIZE: break
             input_noise = model.random_init("noise1", [BATCH_SIZE, 100])
             xn = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:input_noise})
-            yn = np.array([[0, 1]] * len(x))
+            yn = np.array([[0, 1]] * BATCH_SIZE)
             
-            x_ = tf.reshape(x, [len(x), 32 * 32 * 3])
+            x_ = tf.reshape(x, [BATCH_SIZE, 32 * 32 * 3])
             y = np.array([[1, 0]] * BATCH_SIZE)
 
-            data = np.concatenate((x_, xn))
-            label = np.concatenate((y, yn))
-
-            sess.run(dis_train_step, feed_dict={gan.raw_input_image:data, label_:label})
+            sess.run(dis_train_step, feed_dict={gan.raw_input_image:x_, label_:y})
+            sess.run(dis_train_step, feed_dict={gan.raw_input_image:xn, label_:yn})
 
             if batch_step % 20 == 0:
                 print("Epoch %d, Batch: %d" % (step, batch_step))
