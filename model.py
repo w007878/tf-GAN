@@ -21,8 +21,8 @@ def transpose_conv(x, W, output_shape, strides=[1, 2, 2, 1]):
 def conv_layer(x, W, strides=[1, 2, 2, 1]):
     return tf.nn.conv2d(x, filter=W, strides=strides, padding="SAME")
 
-def stack_bias(x, W, name="bias"):
-    return random_init(name, [x.shape[0], x.shape[1], x.shape[2], W.shape[2]])
+def stack_bias(W, name="bias"):
+    return random_init(name, W)
 
 # The generator model    
 def Generator(input):
@@ -38,23 +38,23 @@ def Generator(input):
     # Four Convolution Layers
     with tf.variable_scope("conv1"):
         conv1_W = random_init("filter", [5, 5, 512, 1024])
-        conv1_b = stack_bias(fc_h, conv1_W)
+        conv1_b = stack_bias([BATCH_SIZE, 8, 8, 512])
         conv1_h = leakly_relu(transpose_conv(fc_h, conv1_W, [BATCH_SIZE, 8, 8, 512]) + conv1_b)
     
     with tf.variable_scope("conv2"):
         conv2_W = random_init("filter", [5, 5, 256, 512])
-        conv2_b = stack_bias(conv1__h, conv2_W)
-        conv2_h = leakly_relu(transpose_conv(conv1_h, conv2_W, [BATCH_SIZE, 16, 16, 512]) + conv2_b)
+        conv2_b = stack_bias([BATCH_SIZE, 16, 16, 256])
+        conv2_h = leakly_relu(transpose_conv(conv1_h, conv2_W, [BATCH_SIZE, 16, 16, 256]) + conv2_b)
 
     with tf.variable_scope("conv3"):
         conv3_W = random_init("filter", [5, 5, 128, 256])
-        conv3_b = stack_bias(conv2_h, conv3_W)
-        conv3_h = leakly_relu(transpose_conv(conv2_h, conv3_W, [BATCH_SIZE, 32, 32, 512]) + conv3_b)
+        conv3_b = stack_bias([BATCH_SIZE, 32, 32, 128])
+        conv3_h = leakly_relu(transpose_conv(conv2_h, conv3_W, [BATCH_SIZE, 32, 32, 128]) + conv3_b)
 
     with tf.variable_scope("conv4"):
         conv4_W = random_init("filter", [5, 5, 3, 128])
-        conv4_b = stack_bias(conv3_h, conv4_W)
-        conv4_h = tf.nn.tanh(transpose_conv(conv3_h, conv4_W, [BATCH_SIZE, 32, 32, 512], 
+        conv4_b = stack_bias([BATCH_SIZE, 32, 32, 3])
+        conv4_h = tf.nn.tanh(transpose_conv(conv3_h, conv4_W, [BATCH_SIZE, 32, 32, 3], 
                                             strides=[1, 1, 1, 1]) + conv4_b)
 
     return tf.reshape(conv4_h, [BATCH_SIZE, 32 * 32 * 3])
@@ -65,22 +65,22 @@ def Discriminator(input):
 
     with tf.variable_scope("conv1"):
         conv1_W = random_init("filter", [5, 5, 3, 32])
-        conv1_b = stack_bias(image, conv1_W)
+        conv1_b = stack_bias([BATCH_SIZE, 16, 16, 32])
         conv1_h = leakly_relu(conv_layer(image, conv1_W) + conv1_b)
     
     with tf.variable_scope("conv2"):
         conv2_W = random_init("filter", [5, 5, 32, 64])
-        conv2_b = stack_bias(conv1_h, conv2_W)
+        conv2_b = stack_bias([BATCH_SIZE, 8, 8, 64])
         conv2_h = leakly_relu(conv_layer(conv1_h, conv2_W) + conv2_b)
 
     with tf.variable_scope("conv3"):
         conv3_W = random_init("filter", [5, 5, 64, 128])
-        conv3_b = stack_bias(conv2_h, conv3_W)
+        conv3_b = stack_bias([BATCH_SIZE, 4, 4, 128])
         conv3_h = leakly_relu(conv_layer(conv2_h, conv3_W) + conv3_b)
 
     with tf.variable_scope("conv4"):
         conv4_W = random_init("filter", [5, 5, 128, 256])
-        conv4_b = stack_bias(conv3_h, conv4_W)
+        conv4_b = stack_bias([BATCH_SIZE, 2, 2, 256])
         conv4_h = tf.nn.tanh(conv_layer(conv3_h, conv4_W) + conv4_b)
         conv4_flat = tf.reshape(conv4_h, [BATCH_SIZE, 2 * 2 * 256])
         
