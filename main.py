@@ -9,6 +9,9 @@ EPOCH_SIZE = 100
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
+def init_random(shape):
+    return np.random.normal(0.0, 0.02, shape)
+
 def next_batch(x, y, batch_size=BATCH_SIZE):
     i = 0
     while(i < len(x)):
@@ -43,7 +46,7 @@ if __name__ == '__main__':
             batch_step = batch_step + 1
 
             if len(x) < BATCH_SIZE: break
-            input_noise = model.random_init("noise1", [BATCH_SIZE, 100])
+            input_noise = init_random((BATCH_SIZE, 100))
             xn = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:input_noise})
             yn = np.array([[0, 1]] * BATCH_SIZE)
             
@@ -55,9 +58,9 @@ if __name__ == '__main__':
 
             if batch_step % 20 == 0:
                 print("Epoch %d, Batch: %d" % (step, batch_step))
-                input_noise = model.random_init("noise2", [BATCH_SIZE, 100])
+                input_noise = init_random((BATCH_SIZE, 100))
                 y = np.array([[1, 0]] * BATCH_SIZE)
                 sess.run(gen_train_step, feed_dict={gan.raw_input_noise:input_noise, label_:y})
 
-        data = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:model.random_init("noise3", [100, 100])})
+        data = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:init_random((BATCH_SIZE, 100))})[0:100]
         ldata.cv2_save(n=10, m=10, data=(data + 1.) / 2., file_path="gen/{}.png".format(step))
