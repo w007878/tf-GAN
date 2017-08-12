@@ -91,7 +91,7 @@ if __name__ == '__main__':
             sess.run(dis_train_step, feed_dict={gan.raw_input_image:tx[0:BATCH_SIZE], label_:ty[0:BATCH_SIZE]})
             # sess.run(dis_train_step, feed_dict={gan.raw_input_image:xn, label_:yn})
 
-            if batch_step % 20 == 0:
+            if batch_step % 5 == 0:
                 print("Epoch %d, Batch: %d" % (step, batch_step))
                 input_noise = init_random((BATCH_SIZE, 100))
                 y = np.array([[1]] * BATCH_SIZE)
