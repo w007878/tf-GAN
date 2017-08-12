@@ -18,7 +18,7 @@ def load_SVHN():
     for i in range(len(label)):
         ans[i, label[i][0] % 10] = 1
         
-    return data, ans
+    return data / 255., ans
 
 #     
 # def visual_data(n, m, data, label):

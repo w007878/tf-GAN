@@ -24,6 +24,11 @@ if __name__ == '__main__':
     gan = model.GAN()
     
     images, labels = ldata.load_SVHN()
+#    print np.max(images), np.min(images)
+#    images = images / 255.
+
+#    ldata.cv2_save(n=10, m=10, data=images[0:100], file_path="meow.png")
+
     images = (images - 0.5) * 2.
     
     label_ = tf.placeholder(tf.float32, [None, 2])
