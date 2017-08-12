@@ -38,8 +38,15 @@ if __name__ == '__main__':
     # dis_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label_, logits=gan.dis))
     # gen_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label_, logits=gan.dis_gen))
 
-    gen_train_step = tf.train.MomentumOptimizer(0.0002, 0.5).minimize(gen_loss)
-    dis_train_step = tf.train.MomentumOptimizer(0.0002, 0.5).minimize(dis_loss)
+    dis_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='gan/dis')
+    gen_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='gan/gen')
+
+    print dis_vars, gen_vars
+    
+    dis_train_step = tf.train.MomentumOptimizer(0.0002, 0.5).minimize(dis_loss, var_list=dis_vars)
+    gen_train_step = tf.train.MomentumOptimizer(0.0002, 0.5).minimize(gen_loss, var_list=gen_vars)
+    # dis_train_step = tf.train.MomentumOptimizer(0.0002, 0.5).minimize(dis_loss, var_list=dis_var)
+    # gen_train_step = tf.train.MomentumOptimizer(0.0002, 0.5).minimize(gen_loss, var_list=gen_var)
 
     correct_prediction = tf.equal(tf.sign(label_), tf.sign(gan.dis))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
@@ -49,10 +56,13 @@ if __name__ == '__main__':
 #    print gen_train_step
     sess.run(tf.global_variables_initializer())
 
+    print tf.GraphKeys.TRAINABLE_VARIABLES
+    print gen_train_step
+    
     for step in range(EPOCH_SIZE):
 
         batch_step = 0
-        for x, _ in next_batch(images, labels):
+        for x, _ in next_batch(images, labels):                                                                                                                                                                                                                                                                                                                             
             batch_step = batch_step + 1
 
             if len(x) < BATCH_SIZE: break
@@ -70,7 +80,7 @@ if __name__ == '__main__':
             tx = np.concatenate((xn, x_))[rindex]
             ty = np.concatenate((yn, y))[rindex]
 
-            train_accuracy  = accuracy.eval(session=sess, feed_dict={gan.raw_input_image:tx[0:BATCH_SIZE], label_:ty[0:BATCH_SIZE]})
+            train_accuracy = accuracy.eval(session=sess, feed_dict={gan.raw_input_image:tx[0:BATCH_SIZE], label_:ty[0:BATCH_SIZE]})
             
             print("step training accuracy %g" % (train_accuracy))
             #ldata.cv2_save(n=10, m=10, data=(tx[0:100] + 1) / 2., file_path="meow.png")
