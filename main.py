@@ -10,7 +10,7 @@ EPOCH_SIZE = 100
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
 def init_random(shape):
-    return np.random.normal(0.0, 0.02, shape)
+    return np.random.normal(0.0, 20.0, shape)
 
 def next_batch(x, y, batch_size=BATCH_SIZE):
     i = 0
@@ -30,7 +30,8 @@ if __name__ == '__main__':
 #    ldata.cv2_save(n=10, m=10, data=images[0:100], file_path="meow.png")
 
     images = (images - 0.5) * 2.
-    
+    ldata.cv2_save(n=10, m=10, data=(images[0:100] + 1) / 2., file_path="meow.png")
+     
     label_ = tf.placeholder(tf.float32, [None, 2])
     
     dis_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label_, logits=gan.dis))
@@ -39,9 +40,12 @@ if __name__ == '__main__':
     gen_train_step = tf.train.MomentumOptimizer(0.0002, 0.5).minimize(gen_loss)
     dis_train_step = tf.train.MomentumOptimizer(0.0002, 0.5).minimize(dis_loss)
 
-    print dis_train_step
+    correct_prediction = tf.equal(tf.argmax(label_, 1), tf.argmax(gan.dis, 1))
+    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
+#    print dis_train_step
     
-    print gen_train_step
+#    print gen_train_step
     sess.run(tf.global_variables_initializer())
 
     for step in range(EPOCH_SIZE):
@@ -49,6 +53,7 @@ if __name__ == '__main__':
         batch_step = 0
         for x, _ in next_batch(images, labels):
             batch_step = batch_step + 1
+
 
             if len(x) < BATCH_SIZE: break
             input_noise = init_random((BATCH_SIZE, 100))
@@ -58,10 +63,17 @@ if __name__ == '__main__':
             x_ = np.reshape(x, (BATCH_SIZE, 32 * 32 * 3))
             y = np.array([[1, 0]] * BATCH_SIZE)
             
-            rindex = [i for i in 2 * range(BATCH_SIZE)]
+            print xn
+
+            rindex = [i for i in range(2 * BATCH_SIZE)]
             np.random.shuffle(rindex)
             tx = np.concatenate((xn, x_))[rindex]
             ty = np.concatenate((yn, y))[rindex]
+
+            train_accuracy   = accuracy.eval(session=sess, feed_dict={gan.raw_input_image:tx[0:BATCH_SIZE], label_:ty[0:BATCH_SIZE]})
+            
+            print("step training accuracy %g" % (train_accuracy))
+            #ldata.cv2_save(n=10, m=10, data=(tx[0:100] + 1) / 2., file_path="meow.png")
             
             if batch_step % 100 == 0:
                 ldata.cv2_save(n=16, m=16, data=(tx + 1.) / 2., file_path="gen/{}-{}.png".format(step, batch_step))
