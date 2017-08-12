@@ -42,7 +42,7 @@ if __name__ == '__main__':
         for x, _ in next_batch(images, labels):
             batch_step = batch_step + 1
 
-            if len(xn) < BATCH_SIZE: break
+            if len(x) < BATCH_SIZE: break
             input_noise = model.random_init("noise1", [BATCH_SIZE, 100])
             xn = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:input_noise})
             yn = np.array([[0, 1]] * BATCH_SIZE)
