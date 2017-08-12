@@ -53,8 +53,16 @@ if __name__ == '__main__':
             x_ = np.reshape(x, (BATCH_SIZE, 32 * 32 * 3))
             y = np.array([[1, 0]] * BATCH_SIZE)
 
-            sess.run(dis_train_step, feed_dict={gan.raw_input_image:x_, label_:y})
-            sess.run(dis_train_step, feed_dict={gan.raw_input_image:xn, label_:yn})
+            tx = np.concatenate((xn, x_))
+            ty = np.concatenate((yn, y))
+            
+            rindex = [i for i in range(BATCH_SIZE)]
+            rindex = np.random.shufflw(rindex)
+            tx = tx[rindex][0:BATCH_SIZE]
+            ty = ty[rindex][0:BATCH_SIZE]
+            
+            sess.run(dis_train_step, feed_dict={gan.raw_input_image:tx, label_:yy})
+            # sess.run(dis_train_step, feed_dict={gan.raw_input_image:xn, label_:yn})
 
             if batch_step % 20 == 0:
                 print("Epoch %d, Batch: %d" % (step, batch_step))
@@ -63,4 +71,5 @@ if __name__ == '__main__':
                 sess.run(gen_train_step, feed_dict={gan.raw_input_noise:input_noise, label_:y})
 
         data = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:init_random((BATCH_SIZE, 100))})[0:100]
-        ldata.cv2_save(n=10, m=10, data=(data + 1.) / 2., file_path="gen/{}.png".format(step))
+        
+        ldata.cv2_save(n=10, m=10, data=(data + 1.) / 2.), file_path="gen/{}.png".format(step))
