@@ -62,7 +62,7 @@ if __name__ == '__main__':
     for step in range(EPOCH_SIZE):
 
         batch_step = 0
-        for x, _ in next_batch(images, labels):                                                                                                                                                                                                                                                                                                                             
+        for x, _ in next_batch(images,labels):                                             
             batch_step = batch_step + 1
 
             if len(x) < BATCH_SIZE: break
@@ -91,11 +91,11 @@ if __name__ == '__main__':
             sess.run(dis_train_step, feed_dict={gan.raw_input_image:tx[0:BATCH_SIZE], label_:ty[0:BATCH_SIZE]})
             # sess.run(dis_train_step, feed_dict={gan.raw_input_image:xn, label_:yn})
 
-            # if batch_step % 20 == 0:
-            # print("Epoch %d, Batch: %d" % (step, batch_step))
-            input_noise = init_random((BATCH_SIZE, 100))
-            y = np.array([[1]] * BATCH_SIZE)
-            sess.run(gen_train_step, feed_dict={gan.raw_input_noise:input_noise, label_:y})
+            if batch_step % 20 == 0:
+                print("Epoch %d, Batch: %d" % (step, batch_step))
+                input_noise = init_random((BATCH_SIZE, 100))
+                y = np.array([[1]] * BATCH_SIZE)
+                sess.run(gen_train_step, feed_dict={gan.raw_input_noise:input_noise, label_:y})
 
         data = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:init_random((BATCH_SIZE, 100))})[0:100]
         
