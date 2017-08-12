@@ -72,4 +72,4 @@ if __name__ == '__main__':
 
         data = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:init_random((BATCH_SIZE, 100))})[0:100]
         
-        ldata.cv2_save(n=10, m=10, data=(data + 1.) / 2.), file_path="gen/{}.png".format(step))
+        ldata.cv2_save(n=10, m=10, data=(data + 1.) / 2., file_path="gen/{}.png".format(step))
