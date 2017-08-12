@@ -33,22 +33,22 @@ def Generator(input):
         fc_h = tf.reshape(fc_h, [-1, 4, 4, 1024])
 
     # Four Convolution Layers
-    with tf.variavle_scope("conv1"):
+    with tf.variable_scope("conv1"):
         conv1_W = random_init("filter", [5, 5, 512, 1024])
         conv1_b = random_init("bias", [8, 8])
         conv1_h = leakly_relu(transpose_conv(fc_h, conv1_W, [-1, 8, 8, 512]) + conv1_b)
     
-    with tf.variavle_scope("conv2"):
+    with tf.variable_scope("conv2"):
         conv2_W = random_init("filter", [5, 5, 256, 512])
         conv2_b = random_init("bias", [16, 16])
         conv2_h = leakly_relu(transpose_conv(conv1_h, conv2_W, [-1, 16, 16, 512]) + conv2_b)
 
-    with tf.variavle_scope("conv3"):
+    with tf.variable_scope("conv3"):
         conv3_W = random_init("filter", [5, 5, 128, 256])
         conv3_b = random_init("bias", [32, 32])
         conv3_h = leakly_relu(transpose_conv(conv2_h, conv3_W, [-1, 32, 32, 512]) + conv3_b)
 
-    with tf.variavle_scope("conv4"):
+    with tf.variable_scope("conv4"):
         conv4_W = random_init("filter", [5, 5, 3, 128])
         conv4_b = random_init("bias", [32, 32])
         conv4_h = tf.nn.tanh(transpose_conv(conv3_h, conv4_W, [-1, 32, 32, 512], 
@@ -60,22 +60,22 @@ def Generator(input):
 def Discriminator(input):
     image = tf.reshape(input, [-1, 32, 32, 3])
 
-    with tf.variavle_scope("conv1"):
+    with tf.variable_scope("conv1"):
         conv1_W = random_init("filter", [5, 5, 3, 32])
         conv1_b = random_init("bias", [16, 16])
         conv1_h = leakly_relu(conv_layer(fc_h, conv1_W) + conv1_b)
     
-    with tf.variavle_scope("conv2"):
+    with tf.variable_scope("conv2"):
         conv2_W = random_init("filter", [5, 5, 32, 64])
         conv2_b = random_init("bias", [8, 8])
         conv2_h = leakly_relu(conv_layer(conv1_h, conv2_W) + conv2_b)
 
-    with tf.variavle_scope("conv3"):
+    with tf.variable_scope("conv3"):
         conv3_W = random_init("filter", [5, 5, 64, 128])
         conv3_b = random_init("bias", [4, 4])
         conv3_h = leakly_relu(conv_layer(conv2_h, conv3_W) + conv3_b)
 
-    with tf.variavle_scope("conv4"):
+    with tf.variable_scope("conv4"):
         conv4_W = random_init("filter", [5, 5, 128, 256])
         conv4_b = random_init("bias", [2, 2])
         conv4_h = tf.nn.tanh(conv_layer(conv3_h, conv4_W) + conv4_b)
