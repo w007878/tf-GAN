@@ -52,16 +52,13 @@ if __name__ == '__main__':
             
             x_ = np.reshape(x, (BATCH_SIZE, 32 * 32 * 3))
             y = np.array([[1, 0]] * BATCH_SIZE)
-
-            tx = np.concatenate((xn, x_))
-            ty = np.concatenate((yn, y))
             
-            rindex = [i for i in range(BATCH_SIZE)]
+            rindex = [i for i in 2 * range(BATCH_SIZE)]
             rindex = np.random.shufflw(rindex)
-            tx = tx[rindex][0:BATCH_SIZE]
-            ty = ty[rindex][0:BATCH_SIZE]
+            tx = np.concatenate((xn, x_))[rindex]
+            ty = np.concatenate((yn, y))[rindex]
             
-            sess.run(dis_train_step, feed_dict={gan.raw_input_image:tx, label_:yy})
+            sess.run(dis_train_step, feed_dict={gan.raw_input_image:tx[0:BATCH_SIZE], label_:ty[0:BATCH_SIZE]})
             # sess.run(dis_train_step, feed_dict={gan.raw_input_image:xn, label_:yn})
 
             if batch_step % 20 == 0:
