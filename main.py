@@ -54,7 +54,7 @@ if __name__ == '__main__':
             y = np.array([[1, 0]] * BATCH_SIZE)
             
             rindex = [i for i in 2 * range(BATCH_SIZE)]
-            rindex = np.random.shufflw(rindex)
+            rindex = np.random.shuffle(rindex)
             tx = np.concatenate((xn, x_))[rindex]
             ty = np.concatenate((yn, y))[rindex]
             
