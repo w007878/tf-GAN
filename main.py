@@ -5,7 +5,7 @@ import model
 import os
 
 from model import BATCH_SIZE
-EPOCH_SIZE = 100
+EPOCH_SIZE = 1000
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
@@ -85,17 +85,17 @@ if __name__ == '__main__':
             print("step training accuracy %g" % (train_accuracy))
             #ldata.cv2_save(n=10, m=10, data=(tx[0:100] + 1) / 2., file_path="meow.png")
             
-            if batch_step % 100 == 0:
+            if batch_step % 400 == 0:
                 ldata.cv2_save(n=16, m=16, data=(tx + 1.) / 2., file_path="gen/{}-{}.png".format(step, batch_step))
             
             sess.run(dis_train_step, feed_dict={gan.raw_input_image:tx[0:BATCH_SIZE], label_:ty[0:BATCH_SIZE]})
             # sess.run(dis_train_step, feed_dict={gan.raw_input_image:xn, label_:yn})
 
-            # if batch_step % 20 == 0:
-            #     print("Epoch %d, Batch: %d" % (step, batch_step))
-            #     input_noise = init_random((BATCH_SIZE, 100))
-            #     y = np.array([[1]] * BATCH_SIZE)
-            #     sess.run(gen_train_step, feed_dict={gan.raw_input_noise:input_noise, label_:y})
+            if batch_step % 20 == 0:
+                print("Epoch %d, Batch: %d" % (step, batch_step))
+                input_noise = init_random((BATCH_SIZE, 100))
+                y = np.array([[1]] * BATCH_SIZE)
+                sess.run(gen_train_step, feed_dict={gan.raw_input_noise:input_noise, label_:y})
 
         data = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:init_random((BATCH_SIZE, 100))})[0:100]
         
