@@ -33,9 +33,10 @@ if __name__ == '__main__':
     ldata.cv2_save(n=10, m=10, data=(images[0:100] + 1) / 2., file_path="meow.png")
      
     label_ = tf.placeholder(tf.float32, [None, 1])
-    
-    dis_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label_, logits=gan.dis))
-    gen_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label_, logits=gan.dis_gen))
+    dis_loss = tf.losses.mean_squared_error(labels=label_, predictions=gan.dis)    
+    gen_loss = tf.losses.mean_squared_error(labels=label_, predictions=gan.dis_gen)    
+    # dis_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label_, logits=gan.dis))
+    # gen_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label_, logits=gan.dis_gen))
 
     gen_train_step = tf.train.MomentumOptimizer(0.0002, 0.5).minimize(gen_loss)
     dis_train_step = tf.train.MomentumOptimizer(0.0002, 0.5).minimize(dis_loss)
