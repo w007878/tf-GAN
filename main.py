@@ -50,7 +50,7 @@ if __name__ == '__main__':
             xn = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:input_noise})
             yn = np.array([[0, 1]] * BATCH_SIZE)
             
-            x_ = tf.reshape(x, [BATCH_SIZE, 32 * 32 * 3])
+            x_ = np.reshape(x, (BATCH_SIZE, 32 * 32 * 3))
             y = np.array([[1, 0]] * BATCH_SIZE)
 
             sess.run(dis_train_step, feed_dict={gan.raw_input_image:x_, label_:y})
