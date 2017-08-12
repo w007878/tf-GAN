@@ -25,7 +25,7 @@ def Generator(input):
     # input is a [BATCH_SIZE, 100] random tensor / np.array
     
     # First layer: Fully connection
-    with tf.variable_scpoe("fc_layer"):
+    with tf.variable_scope("fc_layer"):
         fc_W = random_init([100, 1024 * 4 * 4])
         fc_b = random_init([1024 * 4 * 4])
         fc_h = leakly_relu(tf.matmul(input, fc_W) + fc_b)
