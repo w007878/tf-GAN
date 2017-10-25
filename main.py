@@ -1,16 +1,16 @@
 import numpy as np
 import tensorflow as tf
 import load_data as ldata
-import model
+import model_v2 as model
 import os
 
-from model import BATCH_SIZE
+from model_v2 import BATCH_SIZE
 EPOCH_SIZE = 1000
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 def init_random(shape):
-    return np.random.normal(0.0, 20.0, shape)
+    return np.random.uniform(0.0, 1.0, shape)
     
 def next_batch(x, y, batch_size=BATCH_SIZE):
     i = 0
@@ -23,6 +23,8 @@ if __name__ == '__main__':
     sess = tf.Session()
     gan = model.GAN()
     
+    train_writer = tf.summary.FileWriter('here', sess.graph)
+    
     images, labels = ldata.load_SVHN()
 #    print np.max(images), np.min(images)
 #    images = images / 255.
@@ -32,9 +34,9 @@ if __name__ == '__main__':
     images = (images - 0.5) * 2.
     ldata.cv2_save(n=10, m=10, data=(images[0:100] + 1) / 2., file_path="meow.png")
      
-    label_ = tf.placeholder(tf.float32, [None, 1])
-    dis_loss = tf.losses.mean_squared_error(labels=label_, predictions=gan.dis)    
-    gen_loss = tf.losses.mean_squared_error(labels=label_, predictions=gan.dis_gen)    
+    label_ = tf.placeholder(tf.int64, [None])
+    dis_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=label_, logits=gan.dis))
+    gen_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=label_, logits=gan.dis_gen))
     # dis_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label_, logits=gan.dis))
     # gen_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label_, logits=gan.dis_gen))
 
@@ -48,7 +50,7 @@ if __name__ == '__main__':
     # dis_train_step = tf.train.MomentumOptimizer(0.0002, 0.5).minimize(dis_loss, var_list=dis_var)
     # gen_train_step = tf.train.MomentumOptimizer(0.0002, 0.5).minimize(gen_loss, var_list=gen_var)
 
-    correct_prediction = tf.equal(tf.sign(label_), tf.sign(gan.dis))
+    correct_prediction = tf.equal(label_, tf.argmax(gan.dis, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 #    print dis_train_step
@@ -66,12 +68,12 @@ if __name__ == '__main__':
             batch_step = batch_step + 1
 
             if len(x) < BATCH_SIZE: break
-            input_noise = init_random((BATCH_SIZE, 100))
+            input_noise = init_random((BATCH_SIZE, 2048))
             xn = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:input_noise})
-            yn = np.array([[-1]] * BATCH_SIZE)
+            yn = np.array([0] * BATCH_SIZE)
             
             x_ = np.reshape(x, (BATCH_SIZE, 32 * 32 * 3))
-            y = np.array([[1]] * BATCH_SIZE)
+            y = np.array([1] * BATCH_SIZE)
             
             # print xn
 
@@ -93,10 +95,10 @@ if __name__ == '__main__':
 
             if batch_step % 5 == 0:
                 print("Epoch %d, Batch: %d" % (step, batch_step))
-                input_noise = init_random((BATCH_SIZE, 100))
-                y = np.array([[1]] * BATCH_SIZE)
+                input_noise = init_random((BATCH_SIZE, 2048))
+                y = np.array([1] * BATCH_SIZE)
                 sess.run(gen_train_step, feed_dict={gan.raw_input_noise:input_noise, label_:y})
 
-        data = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:init_random((BATCH_SIZE, 100))})[0:100]
+        data = gan.gen.eval(session=sess, feed_dict={gan.raw_input_noise:init_random((BATCH_SIZE, 2048))})[0:100]
         
         ldata.cv2_save(n=10, m=10, data=(data + 1.) / 2., file_path="gen/{}.png".format(step))
