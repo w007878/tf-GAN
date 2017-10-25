@@ -45,8 +45,8 @@ if __name__ == '__main__':
 
     print dis_vars, gen_vars
     
-    dis_train_step = tf.train.MomentumOptimizer(0.0002, 0.5).minimize(dis_loss, var_list=dis_vars)
-    gen_train_step = tf.train.MomentumOptimizer(0.0002, 0.5).minimize(gen_loss, var_list=gen_vars)
+    dis_train_step = tf.train.AdamOptimizer(0.0001).minimize(dis_loss, var_list=dis_vars)
+    gen_train_step = tf.train.AdamOptimizer(0.0001).minimize(gen_loss, var_list=gen_vars)
     # dis_train_step = tf.train.MomentumOptimizer(0.0002, 0.5).minimize(dis_loss, var_list=dis_var)
     # gen_train_step = tf.train.MomentumOptimizer(0.0002, 0.5).minimize(gen_loss, var_list=gen_var)
 
@@ -93,7 +93,7 @@ if __name__ == '__main__':
             sess.run(dis_train_step, feed_dict={gan.raw_input_image:tx[0:BATCH_SIZE], label_:ty[0:BATCH_SIZE]})
             # sess.run(dis_train_step, feed_dict={gan.raw_input_image:xn, label_:yn})
 
-            if batch_step % 5 == 0:
+            if batch_step % 40 == 0:
                 print("Epoch %d, Batch: %d" % (step, batch_step))
                 input_noise = init_random((BATCH_SIZE, 2048))
                 y = np.array([1] * BATCH_SIZE)
