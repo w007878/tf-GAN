@@ -7,7 +7,7 @@ import os
 from model_v2 import BATCH_SIZE
 EPOCH_SIZE = 1000
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
 def init_random(shape):
     return np.random.uniform(0.0, 1.0, shape)
